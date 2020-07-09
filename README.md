@@ -1,2 +1,2 @@
 # rhesus-sociality-fGC-uNEO
-Social and sexual behaviors predict adrenocortical and immune system activation in male rhesus macaques.
+How social and sexual behaviors predict fGC and uNEO in male rhesus macaques.
