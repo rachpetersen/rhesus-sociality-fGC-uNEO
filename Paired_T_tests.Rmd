@@ -1,0 +1,60 @@
+---
+title: "Paired_T_tests"
+author: "Rachel"
+date: "7/10/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## 1. Load Libraries:
+```{r message=FALSE, results='hide'}
+x<-c("car", "lme4", "effects", "ggplot2", "grid", "gridExtra", "dplyr", "tibble", "stringr", "condformat", 'kableExtra', 'fitdistrplus', 'sjPlot', "tidyverse", "ggpubr")
+lapply(x, require, character.only = TRUE)
+```
+
+## 2. Load data:
+```{r}
+pairedGC<-read.csv("~/Google Drive/Projects/Masters/R input sheets/GC_paired_t_test.csv", h=T)
+pairedNEO<-read.csv("~/Google Drive/Projects/Masters/R input sheets/NEO_paired_t_test.csv", h=T)
+```
+
+## 3. Paired T-Tests:
+
+### Paired t-test Early vs. Late fGC
+```{r}
+GCPairedt.test <- t.test(pairedGC$Early, pairedGC$Late, paired=TRUE); GCPairedt.test
+```
+
+<div class = "yellow">
+```{r echo=FALSE}
+cat("p= ",GCPairedt.test$p.value, ": non-significant difference between GCs early and late in the mating season.")
+```
+</div>
+
+### Paired t-test Early vs. Late uNEO
+```{r}
+NEOPairedt.test <- t.test(pairedNEO$Early, pairedNEO$Late, paired=TRUE); NEOPairedt.test
+```
+
+<div class = "yellow">
+```{r echo=FALSE}
+cat("p= ",NEOPairedt.test$p.value, ": NEO significantly higher late in the mating season.")
+```
+</div>
+
+
+```{r echo=FALSE}
+t.test.results<- data.frame(Marker= c("GC", "NEO"), t_value= c(GCPairedt.test$statistic, NEOPairedt.test$statistic), Mean_difference= c(GCPairedt.test$estimate, NEOPairedt.test$estimate), CI_low = c(GCPairedt.test$conf.int[2], NEOPairedt.test$conf.int[2]), CI_high= c(GCPairedt.test$conf.int[1], NEOPairedt.test$conf.int[1]), P_value= c(GCPairedt.test$p.value, NEOPairedt.test$p.value)); t.test.results
+
+t.test.results.tidy <- t.test.results %>%
+  mutate_if(is.numeric, round, 3) %>%
+  mutate("P_value" = cell_spec(P_value, "html", color = ifelse(P_value > 0.05, "black", "red"))) %>%
+  kable(format="html", escape = F) %>%
+  column_spec(6, background = "lightyellow") %>%
+  kable_styling(full_width=TRUE); t.test.results.tidy
+
+```
+

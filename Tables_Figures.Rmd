@@ -1,0 +1,340 @@
+---
+title: "Tables_Figures"
+author: "Rachel"
+date: "7/10/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## 1. Load libraries:
+```{r message=FALSE, results='hide'}
+x<-c("car", "lme4", "effects", "ggplot2", "grid", "gridExtra", "dplyr", "tibble", "stringr", "condformat", 'kableExtra', 'crayon', 'fitdistrplus', 'sjPlot', "tidyverse", "ggpubr", "cowplot")
+lapply(x, require, character.only = TRUE)
+```
+
+## 2. Load data:
+```{r}
+GC_Behavior<-read.csv("GC_behavior_matched.csv", h=T)
+TL_NEO<-read.csv("Time-lagged_NEO.csv", h=T)
+Concurrent_NEO<-read.csv("Concurrent_NEO.csv", h=T)
+boxplot<-read.csv("GC_NEO_boxplot.csv",h=T)
+pairedGC<-read.csv("GC_paired_t_test.csv", h=T)
+pairedNEO<-read.csv("NEO_paired_t_test.csv", h=T)
+```
+
+## 3. LMMs:
+```{r}
+GC.LMM1=lmer(log(GC.final.conc)~ FreqAllProx + RelRank + (1|ID) + (1|Month), data=GC_Behavior)
+GC.LMM2=lmer(log(GC.final.conc)~ FreqTotalGR + RelRank + (1|ID) +(1|Month), data=GC_Behavior)
+GC.LMM3=lmer(log(GC.final.conc)~ FreqGRRec + RelRank + (1|ID) +(1|Month), data=GC_Behavior)
+GC.LMM4=lmer(log(GC.final.conc)~ FreqGRGiven + RelRank + (1|ID) +(1|Month), data=GC_Behavior)
+GC.LMM5=lmer(log(GC.final.conc)~ FreqTimeSpentCop + RelRank + (1|ID) +(1|Month), data=GC_Behavior)
+GC.LMM6=lmer(log(GC.final.conc)~ FreqTimeSpentConsort + RelRank + (1|ID) +(1|Month), data=GC_Behavior)
+
+AnovaGC.LMM1<- Anova(GC.LMM1, type="III")
+AnovaGC.LMM2<- Anova(GC.LMM2, type="III")
+AnovaGC.LMM3<- Anova(GC.LMM3, type="III")
+AnovaGC.LMM4<- Anova(GC.LMM4, type="III")
+AnovaGC.LMM5<- Anova(GC.LMM5, type="III")
+AnovaGC.LMM6<- Anova(GC.LMM6, type="III")
+```
+
+```{r}
+NEO.TL.LMM1=lmer(log(NEO.CR)~ FreqAllProx  + RelRank + (1|ID) +(1|Month), data=TL_NEO)
+NEO.TL.LMM2=lmer(log(NEO.CR)~ FreqTotalGR + RelRank +  (1|ID) +(1|Month), data=TL_NEO)
+NEO.TL.LMM3=lmer(log(NEO.CR)~ FreqGRRec + RelRank + (1|ID) +(1|Month), data=TL_NEO)
+NEO.TL.LMM4=lmer(log(NEO.CR)~ FreqGRGiven + RelRank + (1|ID) +(1|Month), data=TL_NEO)
+NEO.TL.LMM5=lmer(log(NEO.CR)~ FreqTimeSpentCop + RelRank + (1|ID) + (1|Month), data=TL_NEO)
+NEO.TL.LMM6=lmer(log(NEO.CR)~ FreqTimeSpentConsort + RelRank + (1|ID) +(1|Month), data=TL_NEO)
+
+AnovaNEO.TL.LMM1<- Anova(NEO.TL.LMM1, type="III")
+AnovaNEO.TL.LMM2<- Anova(NEO.TL.LMM2, type="III")
+AnovaNEO.TL.LMM3<- Anova(NEO.TL.LMM3, type="III")
+AnovaNEO.TL.LMM4<- Anova(NEO.TL.LMM4, type="III")
+AnovaNEO.TL.LMM5<- Anova(NEO.TL.LMM5, type="III")
+AnovaNEO.TL.LMM6<- Anova(NEO.TL.LMM6, type="III")
+```
+
+```{r}
+NEO.Con.LMM1=lmer(log(NEO.CR)~ FreqAllProx  + RelRank + (1|ID) + (1|Month), data=Concurrent_NEO)
+NEO.Con.LMM2=lmer(log(NEO.CR)~ FreqTotalGR + RelRank +  (1|ID) +(1|Month), data=Concurrent_NEO)
+NEO.Con.LMM3=lmer(log(NEO.CR)~ FreqGRRec + RelRank + (1|ID) +(1|Month), data=Concurrent_NEO)
+NEO.Con.LMM4=lmer(log(NEO.CR)~ FreqGRGiven + RelRank + (1|ID) +(1|Month), data=Concurrent_NEO)
+NEO.Con.LMM5=lmer(log(NEO.CR)~ FreqTimeSpentCop + RelRank + (1|ID) +(1|Month), data=Concurrent_NEO)
+NEO.Con.LMM6=lmer(log(NEO.CR)~ FreqTimeSpentConsort + RelRank + (1|ID) +(1|Month), data=Concurrent_NEO)
+
+AnovaNEO.Con.LMM1<- Anova(NEO.Con.LMM1, type="III")
+AnovaNEO.Con.LMM2<- Anova(NEO.Con.LMM2, type="III")
+AnovaNEO.Con.LMM3<- Anova(NEO.Con.LMM3, type="III")
+AnovaNEO.Con.LMM4<- Anova(NEO.Con.LMM4, type="III")
+AnovaNEO.Con.LMM5<- Anova(NEO.Con.LMM5, type="III")
+AnovaNEO.Con.LMM6<- Anova(NEO.Con.LMM6, type="III")
+```
+
+## 4. T-tests:
+
+```{r}
+GCPairedt.test <- t.test(pairedGC$Early, pairedGC$Late, paired=TRUE); GCPairedt.test
+NEOPairedt.test <- t.test(pairedNEO$Early, pairedNEO$Late, paired=TRUE); NEOPairedt.test
+```
+
+
+## 5. Tables:
+### Table 1: Objective 1
+```{r echo=FALSE}
+Obj1.Summary <-data.frame(Response_variable = c("fGC", "", "", "", "Time-lagged uNEO", "", "", "", "Concurrent uNEO", "", "", ""), Fixed_Effect = c("Proximity", "Total Grooming", "Receiving Grooming", "Giving Grooming", "Proximity", "Total Grooming", "Receiving Grooming", "Giving Grooming", "Proximity", "Total Grooming", "Receiving Grooming", "Giving Grooming"), "Estimate" = c(summary(GC.LMM1)$coef[2,"Estimate"], summary(GC.LMM2)$coef[2,"Estimate"], summary(GC.LMM3)$coef[2,"Estimate"], summary(GC.LMM4)$coef[2,"Estimate"], summary(NEO.TL.LMM1)$coef[2,"Estimate"], summary(NEO.TL.LMM2)$coef[2,"Estimate"], summary(NEO.TL.LMM3)$coef[2,"Estimate"], summary(NEO.TL.LMM4)$coef[2,"Estimate"], summary(NEO.Con.LMM1)$coef[2,"Estimate"], summary(NEO.Con.LMM2)$coef[2,"Estimate"], summary(NEO.Con.LMM3)$coef[2,"Estimate"], summary(NEO.Con.LMM4)$coef[2,"Estimate"]), Std_Error= c(summary(GC.LMM1)$coef[2, "Std. Error"], summary(GC.LMM2)$coef[2, "Std. Error"], summary(GC.LMM3)$coef[2, "Std. Error"], summary(GC.LMM4)$coef[2, "Std. Error"],summary(NEO.TL.LMM1)$coef[2,"Std. Error"], summary(NEO.TL.LMM2)$coef[2,"Std. Error"], summary(NEO.TL.LMM3)$coef[2,"Std. Error"], summary(NEO.TL.LMM4)$coef[2,"Std. Error"], summary(NEO.Con.LMM1)$coef[2,"Std. Error"], summary(NEO.Con.LMM2)$coef[2,"Std. Error"], summary(NEO.Con.LMM3)$coef[2,"Std. Error"], summary(NEO.Con.LMM4)$coef[2,"Std. Error"]), t_value= c(summary(GC.LMM1)$coef[2, "t value"], summary(GC.LMM2)$coef[2, "t value"], summary(GC.LMM3)$coef[2, "t value"], summary(GC.LMM4)$coef[2, "t value"], summary(NEO.TL.LMM1)$coef[2,"t value"], summary(NEO.TL.LMM2)$coef[2,"t value"], summary(NEO.TL.LMM3)$coef[2,"t value"], summary(NEO.TL.LMM4)$coef[2,"t value"], summary(NEO.Con.LMM1)$coef[2,"t value"], summary(NEO.Con.LMM2)$coef[2,"t value"], summary(NEO.Con.LMM3)$coef[2,"t value"], summary(NEO.Con.LMM4)$coef[2,"t value"]), Walds_Chi_square= c(AnovaGC.LMM1[2,1], AnovaGC.LMM2[2,1], AnovaGC.LMM3[2,1], AnovaGC.LMM4[2,1], AnovaNEO.TL.LMM1[2,1], AnovaNEO.TL.LMM2[2,1], AnovaNEO.TL.LMM3[2,1], AnovaNEO.TL.LMM4[2,1], AnovaNEO.Con.LMM1[2,1], AnovaNEO.Con.LMM2[2,1], AnovaNEO.Con.LMM3[2,1], AnovaNEO.Con.LMM4[2,1]), P_value = c(AnovaGC.LMM1[2,3], AnovaGC.LMM2[2,3], AnovaGC.LMM3[2,3], AnovaGC.LMM4[2,3], AnovaNEO.TL.LMM1[2,3], AnovaNEO.TL.LMM2[2,3], AnovaNEO.TL.LMM3[2,3], AnovaNEO.TL.LMM4[2,3], AnovaNEO.Con.LMM1[2,3], AnovaNEO.Con.LMM2[2,3], AnovaNEO.Con.LMM3[2,3], AnovaNEO.Con.LMM4[2,3]))
+
+Obj1.Summary <- Obj1.Summary %>%
+  mutate_if(is.numeric, round, 3) %>%
+  mutate(P_value = cell_spec(P_value, "html", bold = ifelse(P_value > 0.05, FALSE, TRUE), color= ifelse(P_value > 0.05, "gray", "black"))) %>%
+  rename("P-value" = P_value, "Wald's χ2" = Walds_Chi_square, "t-value" = t_value, "Std. Error"= Std_Error, "Fixed Effect*"= Fixed_Effect, "Response Variable"= Response_variable) %>%
+  kable(format="html", escape = F) %>%
+  kable_styling("striped", full_width=TRUE) %>%
+  pack_rows(index = c("Objective 1.1" = 4, "Objective 1.2" = 8)) %>%
+  column_spec(1, color = "black") %>%
+  column_spec(2, color = "black") %>%
+  footnote(general = "*All models include male dominance rank as a covariate",
+           general_title = "")
+```
+
+```{r}
+Obj1.Summary
+```
+
+
+### Table 2: Objective 2
+```{r echo=FALSE}
+Obj2.Summary <-data.frame(Response_variable = c("fGC", "", "Time-lagged uNEO", "", "Concurrent uNEO", ""), Fixed_Effect = c("Copulation", "Consort", "Copulation", "Consort", "Copulation", "Consort"), "Estimate" = c(summary(GC.LMM5)$coef[2,"Estimate"], summary(GC.LMM6)$coef[2,"Estimate"],  summary(NEO.TL.LMM5)$coef[2,"Estimate"], summary(NEO.TL.LMM6)$coef[2,"Estimate"],  summary(NEO.Con.LMM5)$coef[2,"Estimate"], summary(NEO.Con.LMM6)$coef[2,"Estimate"]), Std_Error= c(summary(GC.LMM5)$coef[2, "Std. Error"], summary(GC.LMM6)$coef[2, "Std. Error"], summary(NEO.TL.LMM5)$coef[2,"Std. Error"], summary(NEO.TL.LMM6)$coef[2,"Std. Error"], summary(NEO.Con.LMM5)$coef[2,"Std. Error"], summary(NEO.Con.LMM6)$coef[2,"Std. Error"]), t_value= c(summary(GC.LMM5)$coef[2, "t value"], summary(GC.LMM6)$coef[2, "t value"], summary(NEO.TL.LMM5)$coef[2,"t value"], summary(NEO.TL.LMM6)$coef[2,"t value"], summary(NEO.Con.LMM5)$coef[2,"t value"], summary(NEO.Con.LMM6)$coef[2,"t value"]), Walds_Chi_square= c(AnovaGC.LMM5[2,1], AnovaGC.LMM6[2,1], AnovaNEO.TL.LMM5[2,1], AnovaNEO.TL.LMM6[2,1], AnovaNEO.Con.LMM5[2,1], AnovaNEO.Con.LMM6[2,1]), P_value = c(AnovaGC.LMM5[2,3], AnovaGC.LMM6[2,3], AnovaNEO.TL.LMM5[2,3], AnovaNEO.TL.LMM6[2,3], AnovaNEO.Con.LMM5[2,3], AnovaNEO.Con.LMM6[2,3]))
+
+Obj2.Summary <- Obj2.Summary %>%  
+  mutate_if(is.numeric, round, 3) %>%
+  mutate(P_value = cell_spec(P_value, "html", bold = ifelse(P_value > 0.05, FALSE, TRUE), color= ifelse(P_value > 0.05, "gray", "black"))) %>%
+  rename("P-value" = P_value, "Wald's χ2" = Walds_Chi_square, "t-value" = t_value, "Std. Error"= Std_Error, "Fixed Effect*"= Fixed_Effect, "Response Variable"= Response_variable) %>%
+  kable(format="html", escape = F) %>%
+  kable_styling("striped", full_width=TRUE) %>%
+  pack_rows(index = c("Objective 2.1" = 2, "Objective 2.2" = 4)) %>%
+  column_spec(1, color = "black") %>%
+  column_spec(2, color = "black") %>%
+  footnote(general = "*All models include rank as a covariate",
+           general_title = "")
+```
+
+
+```{r}
+Obj2.Summary
+```
+
+
+### Table 3: Objective 3
+```{r echo=FALSE}
+t.test.results<- data.frame(Marker= c("fGC", "uNEO"), t_value= c(GCPairedt.test$statistic, NEOPairedt.test$statistic), Mean_difference= c(GCPairedt.test$estimate, NEOPairedt.test$estimate), CI_high = c(GCPairedt.test$conf.int[2], NEOPairedt.test$conf.int[2]), CI_low= c(GCPairedt.test$conf.int[1], NEOPairedt.test$conf.int[1]), P_value= c(GCPairedt.test$p.value, NEOPairedt.test$p.value))
+
+Obj3.Summary <- t.test.results %>%  
+  mutate_if(is.numeric, round, 3) %>%
+  mutate(P_value = cell_spec(P_value, "html", bold = ifelse(P_value > 0.05, FALSE, TRUE), color= ifelse(P_value > 0.05, "gray", "black"))) %>%
+  rename(" "= Marker, "P-value" = P_value, "Mean difference" = Mean_difference, "t-value" = t_value, "95% CI (high)"= CI_high, "95% CI (low)"= CI_low) %>%
+  kable(format="html", escape = F) %>%
+  kable_styling("striped", full_width=TRUE) %>%
+  column_spec(1, color = "black") %>%
+  pack_rows(index = c("Objective 3.1" = 1, "Objective 3.2" = 1))
+```
+
+```{r}
+Obj3.Summary
+```
+
+## 6. Figures:
+### Fig1: Objective 1.1
+```{r echo=FALSE, warning=FALSE, results= 'hide', message=FALSE, fig.show='hide'}
+GC.LMM1=lmer(log(GC.final.conc)~ FreqAllProx + RelRank + (1|ID) + (1|Month), data=GC_Behavior)
+ef <- effect("FreqAllProx", GC.LMM1, xlevels=list(FreqAllProx=GC_Behavior$FreqAllProx))
+x <- as.data.frame(ef)
+GCProx.plot <- ggplot(x, aes(FreqAllProx, fit)) + 
+  geom_line()  + 
+  geom_point(size=1) +
+  geom_errorbar(aes(ymin=fit-se,
+                    ymax=fit+se), width=0.001, colour="gray", alpha=0.2) +
+  theme_light(base_size=10) +
+  labs(y=expression(paste("fGC (ng/g dry weight)"^"\u2020")), 
+       x="Individuals within 5m per Scan") +
+  theme(axis.title = element_text(size=11, color="black"),
+        axis.title.y= element_text(size=16))
+
+GC.LMM1.Ests<-plot_model(GC.LMM1, show.values=TRUE, title="", axis.labels=c("Rank", "Proximity"), colors= c("black", "gray44"), group.terms=c(1,2), dot.size = 1, line.size = 0.5) +
+  set_theme(axis.title.size=1)
+
+Fig1.Obj1.1 <- ggarrange(GCProx.plot, GC.LMM1.Ests, labels= c("(a)", "(b)"), font.label = list(size = 11)) + 
+  annotation_custom(grid.rect(.5,.5, width=unit(1,"npc"), height=unit(1,"npc"), gp=gpar(lwd=3, fill=NA, col="black"), draw=TRUE)) 
+
+Fig1.Obj1.1 <- annotate_figure(Fig1.Obj1.1, bottom = text_grob(expression(paste("* p< 0.05; ** p<0.01; ", "\u2020", " ln transformed")), hjust = 3.7, x = 1, face = "italic", size = 8))
+
+ggsave("Fig1.pdf", Fig1.Obj1.1, width= 174, height= 100, units= "mm", device=cairo_pdf)
+```
+
+```{r echo=FALSE}
+Fig1.Obj1.1
+```
+
+### Fig2: Objective 1.2
+```{r echo=FALSE, warning=FALSE, results='hide', message=FALSE, fig.show='hide'}
+NEO.TL.LMM2=lmer(log(NEO.CR)~ FreqTotalGR + RelRank + (1|ID) +(1|Month), data=TL_NEO)
+ef <- effect("FreqTotalGR", NEO.TL.LMM2, xlevels=list(FreqTotalGR=TL_NEO$FreqTotalGR))
+x <- as.data.frame(ef)
+NEOTLtotalGr.plot <- ggplot(x, aes(FreqTotalGR, fit)) + 
+  geom_line()  + 
+  geom_point(size=0.8) +
+  geom_errorbar(aes(ymin=fit-se,
+                    ymax=fit+se), width=0.001, color="gray", alpha=0.2) +
+  theme_light(base_size=6) +
+  labs(y=expression(paste("Time-lagged uNEO (ng/mg CR)"^"\u2020")), 
+       x="Total Grooming Rate") +
+  theme(axis.title = element_text(size=6, color="black"),
+        axis.title.y=element_text(size=8))
+
+
+NEO.TL.LMM2.Ests<-plot_model(NEO.TL.LMM2, show.values=TRUE, value.size=2, dot.size = 0.8, line.size = 0.5, colors=c("gray44", "black"), title="", axis.labels=c("Rank", "Total\n Grooming")) +
+  set_theme(axis.textsize.x=.8 ,axis.textsize.y = .6, axis.title.size=0.6)
+
+NEO.TL.Total.Gr.plots <- ggarrange(NEOTLtotalGr.plot, NEO.TL.LMM2.Ests, labels= c("(a)", "(b)"), font.label = list(size = 8))
+
+NEO.TL.LMM3=lmer(log(NEO.CR)~ FreqGRRec + RelRank + (1|ID) +(1|Month), data=TL_NEO)
+ef <- effect("FreqGRRec", NEO.TL.LMM3, xlevels=list(FreqGRRec=TL_NEO$FreqGRRec))
+x <- as.data.frame(ef)
+NEOTLrecGr.plot <- ggplot(x, aes(FreqGRRec, fit)) + 
+  geom_line()  + 
+  geom_point(size=0.8) +
+  geom_errorbar(aes(ymin=fit-se,
+                    ymax=fit+se), width=0.001, color="gray", alpha=0.2) +
+  theme_light(base_size=6) +
+  labs(y=" ", x="Receiving Grooming Rate") +
+  theme(axis.title = element_text(size=6, color="black"))
+
+NEO.TL.LMM3.Ests<-plot_model(NEO.TL.LMM3, show.values=TRUE, value.size=2, dot.size = 0.8, line.size = 0.5, colors=c("gray44", "black"), title="", axis.labels=c("Rank", "Receiving\n Grooming")) +
+  set_theme(axis.textsize.x=.8 ,axis.textsize.y = .6, axis.title.size=0.6)
+
+NEO.TL.Gr.Rec.plots <- ggarrange(NEOTLrecGr.plot, NEO.TL.LMM3.Ests, labels= c("(c)", "(d)"), font.label = list(size = 8))
+NEO.TL.All.plots <- ggarrange(NEO.TL.Total.Gr.plots, NEO.TL.Gr.Rec.plots) +
+  annotation_custom(grid.rect(.5,.5, width=unit(1,"npc"), height=unit(1,"npc"), gp=gpar(lwd=3, fill=NA, col="black"), draw=TRUE))
+
+NEO.Con.LMM2=lmer(log(NEO.CR)~ FreqTotalGR + RelRank + (1|ID) +(1|Month), data=Concurrent_NEO)
+ef <- effect("FreqTotalGR", NEO.Con.LMM2, xlevels=list(FreqTotalGR=Concurrent_NEO$FreqTotalGR))
+x <- as.data.frame(ef)
+NEOCONtotalGr.plot <- ggplot(x, aes(FreqTotalGR, fit)) + 
+  geom_line()  + 
+  geom_point(size=0.8) +
+  geom_errorbar(aes(ymin=fit-se,
+                    ymax=fit+se), width=0.001, color="gray", alpha=0.2) +
+  theme_light(base_size=6) +
+  scale_y_continuous(n.breaks=4) +
+  labs(y=expression(paste("Concurrent uNEO (ng/mg CR)"^"\u2020")), 
+       x="Total Grooming Rate") +
+  theme(axis.title = element_text(size=6, color="black"),
+        axis.title.y = element_text(size = 8))
+
+NEO.Con.LMM2.Ests<-plot_model(NEO.Con.LMM2, show.values=TRUE, value.size=2, dot.size = 0.8, line.size = 0.5, colors=c("gray44", "black"), title="", axis.labels=c("Rank", "Total\n Grooming")) +
+  set_theme(axis.textsize.x=.8 ,axis.textsize.y = .6, axis.title.size=0.6)
+
+NEO.Con.Total.Gr.plots <- ggarrange(NEOCONtotalGr.plot, NEO.Con.LMM2.Ests, labels= c("(e)", "(f)"), font.label = list(size = 8)) 
+
+NEO.Con.LMM3=lmer(log(NEO.CR)~ FreqGRRec + RelRank + (1|ID) +(1|Month), data=Concurrent_NEO)
+ef <- effect("FreqGRRec", NEO.Con.LMM3, xlevels=list(FreqGRRec=Concurrent_NEO$FreqGRRec))
+x <- as.data.frame(ef)
+
+NEOCONGrRec.plot <- ggplot(data=x, aes(x=FreqGRRec, y=fit)) + 
+  geom_line()  + 
+  geom_point(size=0.8) +
+  geom_errorbar(aes(ymin=fit-se,
+                    ymax=fit+se), width=0.001, colour="gray", alpha=0.2) +
+  theme_light(base_size=6) +
+  scale_y_continuous(n.breaks=4, labels=c(5.2,5.4, 5.6, "")) +
+  labs(y=" ", x="Receiving Grooming Rate") +
+  theme(axis.title = element_text(size=6, color="black"))
+
+NEO.Con.LMM3.Ests<-plot_model(NEO.Con.LMM3, show.values=TRUE, value.size=2, dot.size = 0.8, line.size = 0.5, colors=c("gray44", "black"), title="", axis.labels=c("Rank", "Receiving\n Grooming")) +
+  set_theme(axis.textsize.x=.8 ,axis.textsize.y = .6, axis.title.size=0.6)
+
+NEO.Con.Gr.Rec.plots <- ggarrange(NEOCONGrRec.plot, NEO.Con.LMM3.Ests, labels= c("(g)", "(h)"), font.label = list(size = 8)) 
+
+NEO.Con.All.plots<-ggarrange(NEO.Con.Total.Gr.plots, NEO.Con.Gr.Rec.plots) +
+  annotation_custom(grid.rect(.5,.5, width=unit(1,"npc"), height=unit(1,"npc"), gp=gpar(lwd=3, fill=NA, col="black"), draw=TRUE)) 
+
+Fig2.Obj1.2<- ggarrange(NEO.TL.All.plots, NEO.Con.All.plots, nrow=2, ncol=1)
+
+Fig2.Obj1.2 <- annotate_figure(Fig2.Obj1.2, bottom = text_grob(expression(paste("* p< 0.05; ** p<0.01; ", "\u2020", " ln transformed")), hjust = 4.9, x = 1, face = "italic", size = 6))
+
+ggsave("Fig2.pdf", Fig2.Obj1.2, width= 174, height= 120, units= "mm", device=cairo_pdf)
+```
+
+```{r echo=FALSE}
+Fig2.Obj1.2
+```
+
+### Fig3: Objective 2 
+```{r echo=FALSE, warning=FALSE, message=FALSE, results='hide', fig.show='hide'}
+NEO.Con.LMM5=lmer(log(NEO.CR)~ FreqTimeSpentCop + RelRank + (1|ID) +(1|Month), data=Concurrent_NEO)
+ef <- effect("FreqTimeSpentCop", NEO.Con.LMM5, xlevels=list(FreqTimeSpentCop=Concurrent_NEO$FreqTimeSpentCop))
+x <- as.data.frame(ef)
+NEOCONFreqCop.plot <- ggplot(data=x, aes(x=FreqTimeSpentCop, y=fit)) + 
+  geom_line()  + 
+  geom_point(size=1) +
+  geom_errorbar(aes(ymin=fit-se,
+                    ymax=fit+se), width=0.0001, colour="gray", alpha=0.2) +
+  theme_light(base_size=10) +
+  scale_x_continuous(limits=c(0.0,0.08)) +
+  labs(y=expression(paste("Concurrent uNEO (ng/mg CR)"^"\u2020")), x="Copulation Rate") +
+  theme(axis.title = element_text(size=11, color="black"),
+        axis.title.y= element_text(size=14))
+
+
+NEO.Con.LMM5.Ests<-plot_model(NEO.Con.LMM5, show.values=TRUE, title="", colors=c("black", "gray44"), axis.labels=c("Rank", "Copulation"), dot.size = 1, line.size = 0.5, group.terms=c(1,2)) +
+  set_theme(axis.title.size=1)
+
+
+Fig3.Obj2 <- ggarrange(NEOCONFreqCop.plot, NEO.Con.LMM5.Ests, labels= c("(a)", "(b)"), font.label = list(size = 11)) +
+  annotation_custom(grid.rect(.5,.5, width=unit(1,"npc"), height=unit(1,"npc"), gp=gpar(lwd=3, fill=NA, col="black"), draw=TRUE))
+
+Fig3.Obj2 <- annotate_figure(Fig3.Obj2, bottom = text_grob(expression(paste("* p< 0.05; ** p<0.01; ", "\u2020", " ln transformed")), hjust = 3.7, x = 1, face = "italic", size = 8)); Fig3.Obj2
+
+ggsave("Fig3.pdf", Fig3.Obj2, width= 174, height= 100, units= "mm", device=cairo_pdf)
+```
+
+```{r echo=FALSE}
+Fig3.Obj2
+```
+
+### Fig4: Objective 3
+```{r echo=FALSE, warning=FALSE, results='hide', message=FALSE, fig.show='hide'}
+GCbox <- ggplot(boxplot, aes(Time.in.Mating.Season, GC, fill= Time.in.Mating.Season)) +
+  geom_boxplot(alpha=1) +
+  labs(x="Mating Season Progression", 
+       y=expression(paste("fGC (ng/g dry weight)"))) +
+  theme_light() +
+  theme(legend.position="none",
+        axis.title.y=element_text(size=16),
+        axis.title.x = element_text(size=12)) +
+  scale_fill_manual(values=c("lightgray", "darkgray"))
+NEObox <- ggplot(boxplot, aes(Time.in.Mating.Season, NEO, fill= Time.in.Mating.Season)) +
+  geom_boxplot(alpha=1) +
+  labs(x="Mating Season Progression", 
+       y=expression(paste("uNEO (ng/mg CR)"))) +
+  theme_light()+ 
+  theme(legend.position="none",
+        axis.title.y=element_text(size=16),
+        axis.title.x = element_text(size=12))+
+  scale_fill_manual(values=c("lightgray", "darkgray"))+
+  annotate(geom="text", x=1.5, y=500, label="**", size=8)
+
+Fig4.Obj3 <- ggarrange(GCbox, NEObox, labels= c("(a)", "(b)"), font.label = list(size = 11)) +
+  annotation_custom(grid.rect(.5,.5, width=unit(1,"npc"), height=unit(1,"npc"), gp=gpar(lwd=3, fill=NA, col="black"), draw=TRUE))
+
+Fig4.Obj3 <- annotate_figure(Fig4.Obj3, bottom = text_grob("* p< 0.05; ** p<0.01", hjust = 7, x = 1, size = 8)); Fig4.Obj3
+
+ggsave("Fig4.pdf", Fig4.Obj3, width= 174, height= 100, units= "mm", device=cairo_pdf)
+```
+
+```{r echo=FALSE}
+Fig4.Obj3
+```
