@@ -14,178 +14,11 @@ div.yellow pre { background-color:lightyellow; }
 
 ## SECTION 1: LOAD LIBRARIES
 ```{r message=FALSE, results='hide'}
-x<-c("car", "lme4", "effects", "ggplot2", "grid", "gridExtra", "dplyr", "tibble", "stringr", "condformat", 'kableExtra', 'crayon', 'fitdistrplus', 'sjPlot', "tidyverse", "ggpubr", "cowplot")
+x<-c("car", "lme4", "effects", "ggplot2", "grid", "gridExtra", "dplyr", "tibble", "stringr", "condformat", 'kableExtra', 'crayon', 'fitdistrplus', 'sjPlot', "tidyverse", "ggpubr", "cowplot", "lubridate")
 lapply(x, require, character.only = TRUE)
 ```
 
-## SECTION 2: CHECKING MODEL ASSUMPTIONS
-### Load data
-```{r}
-GC<-read.csv("~/Google Drive/Projects/Masters/R input sheets/GCunmatched.csv", h=T)
-NEO<-read.csv("~/Google Drive/Projects/Masters/R input sheets/NEOunmatched.csv", h=T)
-GC_Behavior<-read.csv("~/Google Drive/Projects/Masters/R input sheets/GC_behavior_matched.csv")
-TL_NEO<-read.csv("~/Google Drive/Projects/Masters/R input sheets/Time-lagged_NEO.csv", h=T)
-Concurrent_NEO<-read.csv("~/Google Drive/Projects/Masters/R input sheets/Concurrent_NEO.csv", h=T)
-```
-
-## SECTION 3. CHECK VIFS
-
-### Check VIFs for GC models
-```{r echo=FALSE}
-GC.LM1.vif<-rownames_to_column(as.data.frame(vif(GC.LM1)), "Independent_Variable")
-GC.LM1.vif.tidy<- GC.LM1.vif %>%
-  rename(VIF = "vif(GC.LM1)") %>%
-  add_column(GC_Linear_model = "model 1") %>%
-  dplyr::select(GC_Linear_model, Independent_Variable, VIF) %>%
-  filter(str_detect(Independent_Variable,'FreqAllProx'))
-
-GC.LM2.vif<-rownames_to_column(as.data.frame(vif(GC.LM2)), "Independent_Variable")
-GC.LM2.vif.tidy<- GC.LM2.vif %>%
-  rename(VIF = "vif(GC.LM2)") %>%
-  add_column(GC_Linear_model = "model 2") %>%
-  dplyr::select(GC_Linear_model, Independent_Variable, VIF) %>%
-  filter(str_detect(Independent_Variable, 'FreqTotalGR'))
-
-GC.LM3.vif<-rownames_to_column(as.data.frame(vif(GC.LM3)), "Independent_Variable")
-GC.LM3.vif.tidy<- GC.LM3.vif %>%
-  rename(VIF = "vif(GC.LM3)") %>%
-  add_column(GC_Linear_model = "model 3") %>%
-  dplyr::select(GC_Linear_model, Independent_Variable, VIF) %>%
-  filter(str_detect(Independent_Variable, 'FreqGRRec'))
-
-GC.LM4.vif<-rownames_to_column(as.data.frame(vif(GC.LM4)), "Independent_Variable")
-GC.LM4.vif.tidy<- GC.LM4.vif %>%
-  rename(VIF = "vif(GC.LM4)") %>%
-  add_column(GC_Linear_model = "model 4") %>%
-  dplyr::select(GC_Linear_model, Independent_Variable, VIF) %>%
-  filter(str_detect(Independent_Variable, 'FreqGRGiven'))
-
-GC.LM5.vif<-rownames_to_column(as.data.frame(vif(GC.LM5)), "Independent_Variable")
-GC.LM5.vif.tidy<- GC.LM5.vif %>%
-  rename(VIF = "vif(GC.LM5)") %>%
-  add_column(GC_Linear_model = "model 5") %>%
-  dplyr::select(GC_Linear_model, Independent_Variable, VIF) %>%
-  filter(str_detect(Independent_Variable, 'FreqTimeSpentCop'))
-
-GC.LM6.vif<-rownames_to_column(as.data.frame(vif(GC.LM6)), "Independent_Variable")
-GC.LM6.vif.tidy<- GC.LM6.vif %>%
-  rename(VIF = "vif(GC.LM6)") %>%
-  add_column(GC_Linear_model = "model 6") %>%
-  dplyr::select(GC_Linear_model, Independent_Variable, VIF) %>%
-  filter(str_detect(Independent_Variable, 'FreqTimeSpentConsort'))
-
-All.GC.VIFS <-rbind(GC.LM1.vif.tidy, GC.LM2.vif.tidy, GC.LM3.vif.tidy, GC.LM4.vif.tidy, GC.LM5.vif.tidy, GC.LM6.vif.tidy) %>%
-  kable(format="html", escape = F) %>%
-  kable_styling(full_width=TRUE); All.GC.VIFS
-```
-
-  **All VIFs < 2**
-
-
-### Check VIFs for Time-lagged NEO models
-```{r echo=FALSE}
-NEO.TL.LM1.vif<-rownames_to_column(as.data.frame(vif(NEO.TL.LM1)), "Independent_Variable")
-NEO.TL.LM1.vif.tidy<- NEO.TL.LM1.vif %>%
-  rename(VIF = "vif(NEO.TL.LM1)") %>%
-  add_column(NEO.TL_Linear_model = "model 1") %>%
-  dplyr::select(NEO.TL_Linear_model, Independent_Variable, VIF) %>%
-  filter(str_detect(Independent_Variable,'FreqAllProx'))
-
-NEO.TL.LM2.vif<-rownames_to_column(as.data.frame(vif(NEO.TL.LM2)), "Independent_Variable")
-NEO.TL.LM2.vif.tidy<- NEO.TL.LM2.vif %>%
-  rename(VIF = "vif(NEO.TL.LM2)") %>%
-  add_column(NEO.TL_Linear_model = "model 2") %>%
-  dplyr::select(NEO.TL_Linear_model, Independent_Variable, VIF) %>%
-  filter(str_detect(Independent_Variable, 'FreqTotalGR'))
-
-NEO.TL.LM3.vif<-rownames_to_column(as.data.frame(vif(NEO.TL.LM3)), "Independent_Variable")
-NEO.TL.LM3.vif.tidy<- NEO.TL.LM3.vif %>%
-  rename(VIF = "vif(NEO.TL.LM3)") %>%
-  add_column(NEO.TL_Linear_model = "model 3") %>%
-  dplyr::select(NEO.TL_Linear_model, Independent_Variable, VIF) %>%
-  filter(str_detect(Independent_Variable, 'FreqGRRec'))
-
-NEO.TL.LM4.vif<-rownames_to_column(as.data.frame(vif(NEO.TL.LM4)), "Independent_Variable")
-NEO.TL.LM4.vif.tidy<- NEO.TL.LM4.vif %>%
-  rename(VIF = "vif(NEO.TL.LM4)") %>%
-  add_column(NEO.TL_Linear_model = "model 4") %>%
-  dplyr::select(NEO.TL_Linear_model, Independent_Variable, VIF) %>%
-  filter(str_detect(Independent_Variable, 'FreqGRGiven'))
-
-NEO.TL.LM5.vif<-rownames_to_column(as.data.frame(vif(NEO.TL.LM5)), "Independent_Variable")
-NEO.TL.LM5.vif.tidy<- NEO.TL.LM5.vif %>%
-  rename(VIF = "vif(NEO.TL.LM5)") %>%
-  add_column(NEO.TL_Linear_model = "model 5") %>%
-  dplyr::select(NEO.TL_Linear_model, Independent_Variable, VIF) %>%
-  filter(str_detect(Independent_Variable, 'FreqTimeSpentCop'))
-
-NEO.TL.LM6.vif<-rownames_to_column(as.data.frame(vif(NEO.TL.LM6)), "Independent_Variable")
-NEO.TL.LM6.vif.tidy<- NEO.TL.LM6.vif %>%
-  rename(VIF = "vif(NEO.TL.LM6)") %>%
-  add_column(NEO.TL_Linear_model = "model 6") %>%
-  dplyr::select(NEO.TL_Linear_model, Independent_Variable, VIF) %>%
-  filter(str_detect(Independent_Variable, 'FreqTimeSpentConsort'))
-
-All.NEO.TL.VIFS <-rbind(NEO.TL.LM1.vif.tidy, NEO.TL.LM2.vif.tidy, NEO.TL.LM3.vif.tidy, NEO.TL.LM4.vif.tidy, NEO.TL.LM5.vif.tidy, NEO.TL.LM6.vif.tidy) %>%
-  kable(format="html", escape = F) %>%
-  kable_styling(full_width=TRUE); All.NEO.TL.VIFS
-```
-
-  **All VIFs < 2**
-
-### Check VIFs for Concurrent NEO models
-```{r echo=FALSE}
-NEO.Con.LM1.vif<-rownames_to_column(as.data.frame(vif(NEO.Con.LM1)), "Independent_Variable")
-NEO.Con.LM1.vif.tidy<- NEO.Con.LM1.vif %>%
-  rename(VIF = "vif(NEO.Con.LM1)") %>%
-  add_column(NEO.Con_Linear_model = "model 1") %>%
-  dplyr::select(NEO.Con_Linear_model, Independent_Variable, VIF) %>%
-  filter(str_detect(Independent_Variable,'FreqAllProx'))
-
-NEO.Con.LM2.vif<-rownames_to_column(as.data.frame(vif(NEO.Con.LM2)), "Independent_Variable")
-NEO.Con.LM2.vif.tidy<- NEO.Con.LM2.vif %>%
-  rename(VIF = "vif(NEO.Con.LM2)") %>%
-  add_column(NEO.Con_Linear_model = "model 2") %>%
-  dplyr::select(NEO.Con_Linear_model, Independent_Variable, VIF) %>%
-  filter(str_detect(Independent_Variable, 'FreqTotalGR'))
-
-NEO.Con.LM3.vif<-rownames_to_column(as.data.frame(vif(NEO.Con.LM3)), "Independent_Variable")
-NEO.Con.LM3.vif.tidy<- NEO.Con.LM3.vif %>%
-  rename(VIF = "vif(NEO.Con.LM3)") %>%
-  add_column(NEO.Con_Linear_model = "model 3") %>%
-  dplyr::select(NEO.Con_Linear_model, Independent_Variable, VIF) %>%
-  filter(str_detect(Independent_Variable, 'FreqGRRec'))
-
-NEO.Con.LM4.vif<-rownames_to_column(as.data.frame(vif(NEO.Con.LM4)), "Independent_Variable")
-NEO.Con.LM4.vif.tidy<- NEO.Con.LM4.vif %>%
-  rename(VIF = "vif(NEO.Con.LM4)") %>%
-  add_column(NEO.Con_Linear_model = "model 4") %>%
-  dplyr::select(NEO.Con_Linear_model, Independent_Variable, VIF) %>%
-  filter(str_detect(Independent_Variable, 'FreqGRGiven'))
-
-NEO.Con.LM5.vif<-rownames_to_column(as.data.frame(vif(NEO.Con.LM5)), "Independent_Variable")
-NEO.Con.LM5.vif.tidy<- NEO.Con.LM5.vif %>%
-  rename(VIF = "vif(NEO.Con.LM5)") %>%
-  add_column(NEO.Con_Linear_model = "model 5") %>%
-  dplyr::select(NEO.Con_Linear_model, Independent_Variable, VIF) %>%
-  filter(str_detect(Independent_Variable, 'FreqTimeSpentCop'))
-
-NEO.Con.LM6.vif<-rownames_to_column(as.data.frame(vif(NEO.Con.LM6)), "Independent_Variable")
-NEO.Con.LM6.vif.tidy<- NEO.Con.LM6.vif %>%
-  rename(VIF = "vif(NEO.Con.LM6)") %>%
-  add_column(NEO.Con_Linear_model = "model 6") %>%
-  dplyr::select(NEO.Con_Linear_model, Independent_Variable, VIF) %>%
-  filter(str_detect(Independent_Variable, 'FreqTimeSpentConsort'))
-
-All.NEO.Con.VIFS <-rbind(NEO.Con.LM1.vif.tidy, NEO.Con.LM2.vif.tidy, NEO.Con.LM3.vif.tidy, NEO.Con.LM4.vif.tidy, NEO.Con.LM5.vif.tidy, NEO.Con.LM6.vif.tidy) %>%
-  kable(format="html", escape = F) %>%
-  kable_styling(full_width=TRUE); All.NEO.Con.VIFS
-```
-
-  **All VIFs < 2**
-
-
-## SECTION2.5: CREATININE
+## SECTION2: CREATININE
 ```{r}
 Creatinine <- read.csv("~/Google Drive/Projects/Masters/rhesus-sociality-fGC-uNEO/Creatinine.csv")
 
@@ -206,7 +39,7 @@ summary(mod1)
 anova(mod1, type="III")
 ```
 
-## SECTION 2.6 Number of minutes followed per day
+## SECTION 3: Number of minutes followed per day
 ```{r}
 BehaviorOnly <- read.csv("~/Google Drive/Projects/Masters/R input sheets/RhesusFullBehavior.csv")
 #View(BehaviorOnly)
@@ -222,10 +55,9 @@ MeanDurations$sd_duration <- chron(times= MeanDurations$sd_duration, format= "h:
 View(MeanDurations)
 ```
 
-## SECTION 2.7 IOR
+## SECTION 4: IOR
 ```{r}
 GroomingIOR <- read.csv("~/Google Drive/Projects/Masters/R input sheets/GroomingIOR.csv")
-
 ScanIOR <- read.csv("~/Google Drive/Projects/Masters/R input sheets/ScanIOR.csv")
 ```
 
@@ -238,7 +70,6 @@ View(ScanIOR)
 GroomingIOR$LR <- chron(times= GroomingIOR$LR, format= "h:m:s")
 GroomingIOR$CR <- chron(times= GroomingIOR$CR, format= "h:m:s")
 ```
-
 
 ```{r}
 TotalGrIOR <- GroomingIOR %>%
@@ -266,99 +97,89 @@ cor.test(ScanIOR$CR, ScanIOR$LR)
 ```
 
 
-## SECTION 3: LMM ANALYSES
-### Load the data
-```{r}
-GC_Behavior=read.csv("~/Google Drive/Projects/Masters/R input sheets/GC_behavior_matched.csv", h=T) 
-TL_NEO<-read.csv("~/Google Drive/Projects/Masters/R input sheets/Time-lagged_NEO.csv", h=T)
-Concurrent_NEO<-read.csv("~/Google Drive/Projects/Masters/R input sheets/Concurrent_NEO.csv", h=T)
-```
-
-```{r}
-View(GC_Behavior) #163 entires
-```
-
-```{r}
-GC_Behavior_2DateDiff <- GC_Behavior %>%
-  filter(DateDiff == "2")
-```
-
-```{r}
-View(GC_Behavior_2DateDiff) #34 entries
-```
-
-```{r}
-GC_Behavior_12DateDiff <- GC_Behavior %>%
-  filter(DateDiff == "2" | DateDiff =="1")
-```
-
-```{r}
-View(GC_Behavior_12DateDiff) #65 entries
-```
-
-```{r}
-View(TL_NEO) #213 entries
-```
-
-```{r}
-TL_NEO_15DateDiff <- TL_NEO %>%
-  filter(DateDiff == "15")
-```
-
-```{r}
-View(TL_NEO_15DateDiff) #100 entries
-```
-
-```{r}
-TL_NEO_141516DateDiff <- TL_NEO %>%
-  filter(DateDiff == "15" | DateDiff == "14" | DateDiff == "16")
-```
-
-```{r}
-View(TL_NEO_141516DateDiff) #194 entries
-```
-
-```{r}
-View(Concurrent_NEO) #267 entries
-```
-
-```{r}
-Concurrent_NEO_0DateDiff <- Concurrent_NEO %>%
-  filter(DateDiff == "0")
-```
-
-```{r}
-View(Concurrent_NEO_0DateDiff) #223 entries
-```
-
+## SECTION 5: LMM ANALYSES
 ### GC LMMs
 ```{r}
+GC_Behavior=read.csv("~/Google Drive/Projects/Masters/R input sheets/GC_behavior_matched.csv", h=T) 
+
 GC_Behavior$Behav_Date<- mdy(GC_Behavior$Behav_Date)
-
-GC.LMM1=lmer(log(GC.final.conc)~ FreqAllProx + RelRank + (1|ID) + (1|), data=GC_Behavior)
-GC.LMM1.red=lmer(log(GC.final.conc)~ RelRank + (1|ID) + (1|Month), data=GC_Behavior)
-
-plot(fitted(GC.LMM1), resid(GC.LMM1))
-simulationOutput <- simulateResiduals(fittedModel = GC.LMM1, plot= T)
-
+GC_Behavior$Month <- factor(GC_Behavior$Month)
 ```
 
 
 ```{r}
-GC.LMM1.2day=lmer(log(GC.final.conc)~ FreqAllProx + RelRank + (1|ID) + (1|Month), data=GC_Behavior_2DateDiff)
+GC.LMM1=lmer(log(GC.final.conc)~ FreqAllProx + RelRank + (1|ID) + (1|Month), data=GC_Behavior)
+GC.LMM1.red=lmer(log(GC.final.conc)~ RelRank + (1|ID) + (1|Month), data=GC_Behavior)
 
-plot(fitted(GC.LMM1.2day), resid(GC.LMM1.2day))
-simulationOutput <- simulateResiduals(fittedModel = GC.LMM1.2day, plot= T)
-testDispersion(GC.LMM1.2day)
-testZeroInflation(GC.LMM1.2day)
-
-
-GC.LMM2=lmer(log(GC.final.conc)~ FreqTotalGR + RelRank + (1|ID) +(1|Month), data=GC_Behavior)
-GC.LMM3=lmer(log(GC.final.conc)~ FreqGRRec + RelRank + (1|ID) +(1|Month), data=GC_Behavior)
-GC.LMM4=lmer(log(GC.final.conc)~ FreqGRGiven + RelRank + (1|ID) +(1|Month), data=GC_Behavior)
-GC.LMM5=lmer(log(GC.final.conc)~ FreqTimeSpentCop + RelRank + (1|ID) +(1|Month), data=GC_Behavior)
-GC.LMM6=lmer(log(GC.final.conc)~ FreqTimeSpentConsort + RelRank + (1|ID) +(1|Month), data=GC_Behavior)
+vif(GC.LMM1)
+plot(fitted(GC.LMM1), resid(GC.LMM1))
+qqnorm(resid(GC.LMM1))
+summary(GC.LMM1)
+Anova(GC.LMM1)
+anova(GC.LMM1, GC.LMM1.red)
 ```
+
+```{r}
+GC.LMM2=lmer(log(GC.final.conc)~ FreqTotalGR + RelRank + (1|ID) + (1|Month), data=GC_Behavior)
+GC.LMM2.red=lmer(log(GC.final.conc)~ RelRank + (1|ID) + (1|Month), data=GC_Behavior)
+
+vif(GC.LMM2)
+plot(fitted(GC.LMM2), resid(GC.LMM2))
+qqnorm(resid(GC.LMM2))
+summary(GC.LMM2)
+Anova(GC.LMM2)
+anova(GC.LMM2, GC.LMM2.red)
+```
+
+```{r}
+GC.LMM3=lmer(log(GC.final.conc)~ FreqGRRec + RelRank + (1|ID) + (1|Month), data=GC_Behavior)
+GC.LMM3.red=lmer(log(GC.final.conc)~ RelRank + (1|ID) + (1|Month), data=GC_Behavior)
+
+vif(GC.LMM3)
+plot(fitted(GC.LMM3), resid(GC.LMM3))
+qqnorm(resid(GC.LMM3))
+summary(GC.LMM3)
+Anova(GC.LMM3)
+anova(GC.LMM3, GC.LMM3.red)
+```
+
+```{r}
+GC.LMM4=lmer(log(GC.final.conc)~ FreqGRGiven + RelRank + (1|ID) + (1|Month), data=GC_Behavior)
+GC.LMM4.red=lmer(log(GC.final.conc)~ RelRank + (1|ID) + (1|Month), data=GC_Behavior)
+
+vif(GC.LMM4)
+plot(fitted(GC.LMM4), resid(GC.LMM4))
+qqnorm(resid(GC.LMM4))
+summary(GC.LMM4)
+Anova(GC.LMM4)
+anova(GC.LMM4, GC.LMM4.red)
+```
+
+
+```{r}
+GC.LMM5=lmer(log(GC.final.conc)~ FreqTimeSpentCop + RelRank + (1|ID) + (1|Month), data=GC_Behavior)
+GC.LMM5.red=lmer(log(GC.final.conc)~ RelRank + (1|ID) + (1|Month), data=GC_Behavior)
+
+vif(GC.LMM5)
+plot(fitted(GC.LMM5), resid(GC.LMM5))
+qqnorm(resid(GC.LMM5))
+summary(GC.LMM5)
+Anova(GC.LMM5)
+anova(GC.LMM5, GC.LMM5.red)
+```
+
+```{r}
+GC.LMM6=lmer(log(GC.final.conc)~ FreqTimeSpentConsort + RelRank + (1|ID) + (1|Month), data=GC_Behavior)
+GC.LMM6.red=lmer(log(GC.final.conc)~ RelRank + (1|ID) + (1|Month), data=GC_Behavior)
+
+vif(GC.LMM6)
+plot(fitted(GC.LMM6), resid(GC.LMM6))
+qqnorm(resid(GC.LMM6))
+summary(GC.LMM6)
+Anova(GC.LMM6)
+anova(GC.LMM6, GC.LMM6.red)
+```
+
 
 ### GC LMM summaries
 #### Fixed Effect variable: FreqAllProx
@@ -475,6 +296,26 @@ detach("package:lmerTest", unload=TRUE)
 ```
 
 ### Time-lagged NEO LMMs
+
+```{r}
+TL_NEO<-read.csv("~/Google Drive/Projects/Masters/R input sheets/Time-lagged_NEO.csv", h=T)
+```
+
+
+```{r}
+NEO.TL.LMM1=lmer(log(NEO.CR)~ FreqAllProx + RelRank + (1|ID) + (1|Month), data=TL_NEO)
+NEO.TL.LMM1.red=lmer(log(NEO.CR)~ RelRank + (1|ID) + (1|Month), data=TL_NEO)
+
+vif(NEO.TL.LMM1)
+plot(fitted(NEO.TL.LMM1), resid(NEO.TL.LMM1))
+qqnorm(resid(NEO.TL.LMM1))
+summary(NEO.TL.LMM1)
+Anova(NEO.TL.LMM1)
+anova(NEO.TL.LMM1, NEO.TL.LMM1.red)
+```
+
+
+
 ```{r}
 NEO.TL.LMM1=lmer(log(NEO.CR)~ FreqAllProx  + RelRank + (1|ID) +(1|Month), data=TL_NEO)
 NEO.TL.LMM2=lmer(log(NEO.CR)~ FreqTotalGR + RelRank +  (1|ID) +(1|Month), data=TL_NEO)
@@ -629,6 +470,11 @@ detach("package:lmerTest", unload=TRUE)
 ```
 
 ### Concurrent NEO LMMs
+```{r}
+Concurrent_NEO<-read.csv("~/Google Drive/Projects/Masters/R input sheets/Concurrent_NEO.csv", h=T)
+```
+
+
 ```{r}
 NEO.Con.LMM1=lmer(log(NEO.CR)~ FreqAllProx  + RelRank + (1|ID) + (1|Month), data=Concurrent_NEO)
 NEO.Con.LMM2=lmer(log(NEO.CR)~ FreqTotalGR + RelRank +  (1|ID) +(1|Month), data=Concurrent_NEO)
