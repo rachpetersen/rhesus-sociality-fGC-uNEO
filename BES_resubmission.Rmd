@@ -14,7 +14,7 @@ div.yellow pre { background-color:lightyellow; }
 
 ## SECTION 1: LOAD LIBRARIES
 ```{r message=FALSE, results='hide'}
-x<-c("car", "lme4", "effects", "ggplot2", "grid", "gridExtra", "dplyr", "tibble", "stringr", "condformat", 'kableExtra', 'crayon', 'fitdistrplus', 'sjPlot', "tidyverse", "ggpubr", "cowplot", "lubridate")
+x<-c("car", "lme4", "effects", "ggplot2", "grid", "gridExtra", "dplyr", "tibble", "stringr", "condformat", 'kableExtra', 'crayon', 'fitdistrplus', 'sjPlot', "tidyverse", "ggpubr", "cowplot", "lubridate", "hms")
 lapply(x, require, character.only = TRUE)
 ```
 
@@ -316,12 +316,22 @@ detach("package:lmerTest", unload=TRUE)
 ### Time-lagged NEO LMMs
 
 ```{r}
+NEOunmatched<-read.csv("~/Google Drive/Projects/Masters/rhesus-sociality-fGC-uNEO/NEOunmatched.csv", h=T)
+
+NEOunmatched <- NEOunmatched %>%
+  mutate(NEO_SampleNo = SampleNo) %>%
+  select(NEO_SampleNo, Time)
+  
 TL_NEO<-read.csv("~/Google Drive/Projects/Masters/R input sheets/Time-lagged_NEO.csv", h=T)
+
+TL_NEO <- left_join(TL_NEO, NEOunmatched)
+TL_NEO$Time <- as.POSIXct(TL_NEO$Time,format="%I:%M %p")
+TL_NEO$Time <- as.hms(TL_NEO$Time)
 ```
 
 
 ```{r}
-NEO.TL.LMM1=lmer(log(NEO.CR)~ FreqAllProx + RelRank + (1|ID) + (1|Month), data=TL_NEO)
+NEO.TL.LMM1=lmer(log(NEO.CR)~ FreqAllProx +  RelRank + (1|ID) + (1|Month), data=TL_NEO)
 NEO.TL.LMM1.red=lmer(log(NEO.CR)~ RelRank + (1|ID) + (1|Month), data=TL_NEO)
 
 vif(NEO.TL.LMM1)
@@ -333,10 +343,15 @@ anova(NEO.TL.LMM1, NEO.TL.LMM1.red)
 ```
 
 
+```{r}
+NEO.TL.LMM2=lmer(log(NEO.CR)~ FreqTotalGR + RelRank +  (1|ID) +(1|Month), data=TL_NEO)
+
+summary(NEO.TL.LMM2)
+Anova(NEO.TL.LMM2)
+```
+
 
 ```{r}
-NEO.TL.LMM1=lmer(log(NEO.CR)~ FreqAllProx  + RelRank + (1|ID) +(1|Month), data=TL_NEO)
-NEO.TL.LMM2=lmer(log(NEO.CR)~ FreqTotalGR + RelRank +  (1|ID) +(1|Month), data=TL_NEO)
 NEO.TL.LMM3=lmer(log(NEO.CR)~ FreqGRRec + RelRank + (1|ID) +(1|Month), data=TL_NEO)
 NEO.TL.LMM4=lmer(log(NEO.CR)~ FreqGRGiven + RelRank + (1|ID) +(1|Month), data=TL_NEO)
 NEO.TL.LMM5=lmer(log(NEO.CR)~ FreqTimeSpentCop + RelRank + (1|ID) + (1|Month), data=TL_NEO)
@@ -699,18 +714,23 @@ NEOunmatched <- read.csv("~/Google Drive/Projects/Masters/rhesus-sociality-fGC-u
 Hierarchy <- read.csv("~/Google Drive/Projects/Masters/rhesus-sociality-fGC-uNEO/Rhierarchy52.csv")
 
 NEOunmatched <- NEOunmatched %>%
-  rename(Focal.ID = Animal.ID) 
+  rename(Focal.ID = Animal.ID) %>%
+  filter(Time != "")
 
 
 HierarchyTidy <- Hierarchy %>%
   select(ID, RelRank) %>%
   rename(Focal.ID= ID)
 
-NEO$Date <- mdy(NEO$Date)
+
 
 GC <- left_join(GCunmatched, HierarchyTidy)
 NEO <- left_join(NEOunmatched, HierarchyTidy)
 
+NEO$Date <- mdy(NEO$Date)
+
+NEO$Time <- as.POSIXct(NEO$Time,format="%I:%M %p")
+NEO$Time <- as.hms(NEO$Time)
 ```
 
 ```{r}
@@ -720,8 +740,10 @@ NEOnoJan <- NEO %>%
 GCmod <- lmer(log(final.conc) ~ Month + RelRank + (1|Focal.ID), data=GC)
 summary(GCmod)
 
-NEOmod <- lmer(log(NEO.CR) ~ Month + RelRank + (1 |Focal.ID), data= NEO)
+NEOmod <- lmer(log(NEO.CR) ~ Month  + RelRank + (1 |Focal.ID), data= NEO)
 summary(NEOmod)
+Anova(NEOmod)
+
 NEOmod.red <- lmer(log(NEO.CR) ~ RelRank + (1 |Focal.ID), data= NEO)
 summary(NEOmod)
 
