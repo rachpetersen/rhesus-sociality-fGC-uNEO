@@ -20,24 +20,42 @@ lapply(x, require, character.only = TRUE)
 
 ## SECTION2: CREATININE
 ```{r}
-Creatinine <- read.csv("~/Google Drive/Projects/Masters/rhesus-sociality-fGC-uNEO/Creatinine.csv")
+NEO<- read.csv("~/Google Drive/Projects/Masters/rhesus-sociality-fGC-uNEO/NEOunmatched.csv")
+Hierarchy <- read.csv("~/Google Drive/Projects/Masters/rhesus-sociality-fGC-uNEO/Rhierarchy52.csv")
 
-View(Creatinine)
-Creatinine$Date<- mdy(Creatinine$Date)
+NEO$Date<- mdy(NEO$Date)
 
-Creatinine <- Creatinine %>%
-  filter(Date > "2015-01-01") %>%
-  mutate(DaysSince = Date - "2015-01-01")
+mod1 <- lmer(log(CR.DF) ~ Month + (1|Animal.ID), data= NEO)
 
-mod1 <- lmer(log(CR) ~ Date + (1|Focal.ID), data= Creatinine)
+mod1 <- lmer(log(CR.DF) ~ Month + (1+ RelRank|Animal.ID), data= NEO)
 
 plot(mod1)
 
 plot(fitted(mod1) ~ resid(mod1))
+qqnorm(resid(mod1))
 
 summary(mod1)
-anova(mod1, type="III")
+Anova(mod1)
+
+
+
+NEOunmatched <- NEOunmatched %>%
+  rename(Focal.ID = Animal.ID)
+
+HierarchyTidy <- Hierarchy %>%
+  select(ID, RelRank) %>%
+  rename(Focal.ID= ID)
+
+GC <- left_join(GCunmatched, HierarchyTidy)
+NEO <- left_join(NEOunmatched, HierarchyTidy)
 ```
+
+```{r}
+AverageCR.DF <- NEO %>%
+  group_by(Month) %>%
+  summarise(mean = mean(CR.DF))
+```
+
 
 ## SECTION 3: Number of minutes followed per day
 ```{r}
@@ -669,6 +687,51 @@ t.test.results.tidy <- t.test.results %>%
   column_spec(6, background = "lightyellow") %>%
   kable_styling(full_width=TRUE); t.test.results.tidy
 
+```
+
+
+## SECTION 4.5: Mixed model for mating season progression
+```{r}
+GCunmatched <- read.csv("~/Google Drive/Projects/Masters/rhesus-sociality-fGC-uNEO/GCunmatched.csv")
+
+NEOunmatched <- read.csv("~/Google Drive/Projects/Masters/rhesus-sociality-fGC-uNEO/NEOunmatched.csv")
+
+Hierarchy <- read.csv("~/Google Drive/Projects/Masters/rhesus-sociality-fGC-uNEO/Rhierarchy52.csv")
+
+NEOunmatched <- NEOunmatched %>%
+  rename(Focal.ID = Animal.ID) 
+
+
+HierarchyTidy <- Hierarchy %>%
+  select(ID, RelRank) %>%
+  rename(Focal.ID= ID)
+
+NEO$Date <- mdy(NEO$Date)
+
+GC <- left_join(GCunmatched, HierarchyTidy)
+NEO <- left_join(NEOunmatched, HierarchyTidy)
+
+```
+
+```{r}
+NEOnoJan <- NEO %>%
+  filter(Month != "1")
+
+GCmod <- lmer(log(final.conc) ~ Month + RelRank + (1|Focal.ID), data=GC)
+summary(GCmod)
+
+NEOmod <- lmer(log(NEO.CR) ~ Month + RelRank + (1 |Focal.ID), data= NEO)
+summary(NEOmod)
+NEOmod.red <- lmer(log(NEO.CR) ~ RelRank + (1 |Focal.ID), data= NEO)
+summary(NEOmod)
+
+anova(NEOmod, NEOmod.red, type= "III")
+
+NEOdatemod <- lmer(log(NEO.CR) ~ Date + RelRank + (1 |Focal.ID), data= NEO)
+summary(NEOdatemod)
+
+NEOnoJanmod <- lmer(log(NEO.CR) ~ Month + RelRank + (1 |Focal.ID), data= NEOnoJan)
+summary(NEOnoJanmod)
 ```
 
 
