@@ -14,7 +14,7 @@ div.yellow pre { background-color:lightyellow; }
 
 ## SECTION 1: LOAD LIBRARIES
 ```{r message=FALSE, results='hide'}
-x<-c("car", "lme4", "effects", "ggplot2", "grid", "gridExtra", "dplyr", "tibble", "stringr", "condformat", 'kableExtra', 'crayon', 'fitdistrplus', 'sjPlot', "tidyverse", "ggpubr", "cowplot", "lubridate", "hms")
+x<-c("car", "lme4", "effects", "ggplot2", "grid", "gridExtra", "dplyr", "tibble", "stringr", "condformat", 'kableExtra', 'crayon', 'fitdistrplus', 'sjPlot', "tidyverse", "ggpubr", "cowplot", "lubridate", "hms", "chron")
 lapply(x, require, character.only = TRUE)
 ```
 
@@ -27,27 +27,11 @@ NEO$Date<- mdy(NEO$Date)
 
 mod1 <- lmer(log(CR.DF) ~ Month + (1|Animal.ID), data= NEO)
 
-mod1 <- lmer(log(CR.DF) ~ Month + (1+ RelRank|Animal.ID), data= NEO)
-
-plot(mod1)
-
 plot(fitted(mod1) ~ resid(mod1))
 qqnorm(resid(mod1))
 
 summary(mod1)
 Anova(mod1)
-
-
-
-NEOunmatched <- NEOunmatched %>%
-  rename(Focal.ID = Animal.ID)
-
-HierarchyTidy <- Hierarchy %>%
-  select(ID, RelRank) %>%
-  rename(Focal.ID= ID)
-
-GC <- left_join(GCunmatched, HierarchyTidy)
-NEO <- left_join(NEOunmatched, HierarchyTidy)
 ```
 
 ```{r}
@@ -69,19 +53,12 @@ MeanDurations <- BehaviorOnly %>%
 
 
 MeanDurations$sd_duration <- chron(times= MeanDurations$sd_duration, format= "h:m:s")
-
-View(MeanDurations)
 ```
 
 ## SECTION 4: IOR
 ```{r}
 GroomingIOR <- read.csv("~/Google Drive/Projects/Masters/R input sheets/GroomingIOR.csv")
 ScanIOR <- read.csv("~/Google Drive/Projects/Masters/R input sheets/ScanIOR.csv")
-```
-
-```{r}
-View(GroomingIOR)
-View(ScanIOR)
 ```
 
 ```{r}
@@ -133,7 +110,7 @@ vif(GC.LMM1)
 plot(fitted(GC.LMM1), resid(GC.LMM1))
 qqnorm(resid(GC.LMM1))
 summary(GC.LMM1)
-Anova(GC.LMM1)
+AnovaGC.LMM1 <- Anova(GC.LMM1, type= "III")
 anova(GC.LMM1, GC.LMM1.red)
 ```
 
@@ -145,7 +122,7 @@ vif(GC.LMM2)
 plot(fitted(GC.LMM2), resid(GC.LMM2))
 qqnorm(resid(GC.LMM2))
 summary(GC.LMM2)
-Anova(GC.LMM2)
+AnovaGC.LMM2 <- Anova(GC.LMM2, type="III")
 anova(GC.LMM2, GC.LMM2.red)
 ```
 
@@ -157,7 +134,7 @@ vif(GC.LMM3)
 plot(fitted(GC.LMM3), resid(GC.LMM3))
 qqnorm(resid(GC.LMM3))
 summary(GC.LMM3)
-Anova(GC.LMM3)
+AnovaGC.LMM3 <- Anova(GC.LMM3, type= "III")
 anova(GC.LMM3, GC.LMM3.red)
 ```
 
@@ -169,7 +146,7 @@ vif(GC.LMM4)
 plot(fitted(GC.LMM4), resid(GC.LMM4))
 qqnorm(resid(GC.LMM4))
 summary(GC.LMM4)
-Anova(GC.LMM4)
+AnovaGC.LMM4 <- Anova(GC.LMM4, type= "III")
 anova(GC.LMM4, GC.LMM4.red)
 ```
 
@@ -182,7 +159,7 @@ vif(GC.LMM5)
 plot(fitted(GC.LMM5), resid(GC.LMM5))
 qqnorm(resid(GC.LMM5))
 summary(GC.LMM5)
-Anova(GC.LMM5)
+AnovaGC.LMM5 <- Anova(GC.LMM5, type= "III")
 anova(GC.LMM5, GC.LMM5.red)
 ```
 
@@ -194,90 +171,12 @@ vif(GC.LMM6)
 plot(fitted(GC.LMM6), resid(GC.LMM6))
 qqnorm(resid(GC.LMM6))
 summary(GC.LMM6)
-Anova(GC.LMM6)
+AnovaGC.LMM6 <- Anova(GC.LMM6, type= "III")
 anova(GC.LMM6, GC.LMM6.red)
 ```
 
 
 ### GC LMM summaries
-#### Fixed Effect variable: FreqAllProx
-```{r echo=FALSE}
-GC.LMM1=lmer(log(GC.final.conc)~ FreqAllProx + RelRank + (1|ID) + (1|Month), data=GC_Behavior)
-summary(GC.LMM1)
-AnovaGC.LMM1 <-Anova(GC.LMM1, type="III"); AnovaGC.LMM1
-```
-
-<div class = "yellow">
-```{r echo=FALSE, class.source="yellow"}
-cat("p=", AnovaGC.LMM1[2,3], ifelse(AnovaGC.LMM1[2,3]<0.05, red("**SIGNIFICANT**"), "non-significant"))
-```
-</div>
-
-#### Fixed Effect variable: FreqTotalGR
-```{r echo=FALSE}
-GC.LMM2=lmer(log(GC.final.conc)~ FreqTotalGR + RelRank + (1|ID) +(1|Month), data=GC_Behavior)
-summary(GC.LMM2)
-AnovaGC.LMM2 <- Anova(GC.LMM2, type="III"); AnovaGC.LMM2
-```
-
-<div class = "yellow">
-```{r echo=FALSE}
-cat("p=", AnovaGC.LMM2[2,3], ifelse(AnovaGC.LMM2[2,3]<0.05, red("**SIGNIFICANT**"), "non-significant"))
-```
-</div>
-
-#### Fixed Effect variable: FreqGRRec
-```{r echo=FALSE}
-GC.LMM3=lmer(log(GC.final.conc)~ FreqGRRec + RelRank + (1|ID) +(1|Month), data=GC_Behavior)
-summary(GC.LMM3)
-AnovaGC.LMM3 <-Anova(GC.LMM3, type="III"); AnovaGC.LMM3
-```
-
-<div class = "yellow">
-```{r echo=FALSE}
-cat("p=", AnovaGC.LMM3[2,3], ifelse(AnovaGC.LMM3[2,3]<0.05, "**SIGNIFICANT**", "non-significant"))
-```
-</div>
-
-#### Fixed Effect variable: FreqGRGiven
-```{r}
-GC.LMM4=lmer(log(GC.final.conc)~ FreqGRGiven + RelRank + (1|ID) +(1|Month), data=GC_Behavior)
-summary(GC.LMM4)
-AnovaGC.LMM4 <- Anova(GC.LMM4, type="III"); AnovaGC.LMM4
-```
-
-<div class = "yellow">
-```{r echo=FALSE}
-cat("p=", AnovaGC.LMM4[2,3], ifelse(AnovaGC.LMM4[2,3]<0.05, red("**SIGNIFICANT**"), "non-significant"))
-```
-</div>
-
-#### Fixed Effect variable: FreqTimeSpentCop
-```{r}
-GC.LMM5=lmer(log(GC.final.conc)~ FreqTimeSpentCop + RelRank + (1|ID) +(1|Month), data=GC_Behavior)
-summary(GC.LMM5)
-AnovaGC.LMM5<- Anova(GC.LMM5, type="III"); AnovaGC.LMM5
-```
-
-<div class = "yellow">
-```{r echo=FALSE}
-cat("p=", AnovaGC.LMM5[2,3], ifelse(AnovaGC.LMM5[2,3]<0.05, red("**SIGNIFICANT**"), "non-significant"))
-```
-</div>
-
-#### Fixed Effect variable: FreqTimeSpentConsort
-```{r}
-GC.LMM6=lmer(log(GC.final.conc)~ FreqTimeSpentConsort + RelRank + (1|ID) +(1|Month), data=GC_Behavior)
-summary(GC.LMM6)
-AnovaGC.LMM6<- Anova(GC.LMM6, type="III"); AnovaGC.LMM6
-```
-
-<div class = "yellow">
-```{r echo=FALSE}
-cat("p=", AnovaGC.LMM6[2,3], ifelse(AnovaGC.LMM6[2,3]<0.05, red("**SIGNIFICANT**"), "non-significant")) 
-```
-</div>
-
 ### Summary of Wald Chi-square p-values for Fixed Effects
 ```{r echo=FALSE}
 GC.LMM.All.summary <-data.frame(Response_variable = "fGC", Fixed_Effect = c("FreqAllProx", "FreqTotalGr", "FreqGRRec", "FreqGRGiven", "FreqTimeSpentCop", "FreqTimeSpentConsort"), "Estimate" = c(summary(GC.LMM1)$coef[2,"Estimate"], summary(GC.LMM2)$coef[2,"Estimate"], summary(GC.LMM3)$coef[2,"Estimate"], summary(GC.LMM4)$coef[2,"Estimate"], summary(GC.LMM5)$coef[2,"Estimate"], summary(GC.LMM6)$coef[2,"Estimate"]), Std_Error= c(summary(GC.LMM1)$coef[2, "Std. Error"], summary(GC.LMM2)$coef[2, "Std. Error"], summary(GC.LMM3)$coef[2, "Std. Error"], summary(GC.LMM4)$coef[2, "Std. Error"], summary(GC.LMM5)$coef[2, "Std. Error"], summary(GC.LMM6)$coef[2, "Std. Error"]), t_value= c(summary(GC.LMM1)$coef[2, "t value"], summary(GC.LMM2)$coef[2, "t value"], summary(GC.LMM3)$coef[2, "t value"], summary(GC.LMM4)$coef[2, "t value"], summary(GC.LMM5)$coef[2, "t value"], summary(GC.LMM6)$coef[2, "t value"]), Walds_Chi_square= c(AnovaGC.LMM1[2,1], AnovaGC.LMM2[2,1], AnovaGC.LMM3[2,1], AnovaGC.LMM4[2,1], AnovaGC.LMM5[2,1], AnovaGC.LMM6[2,1]), P_value = c(AnovaGC.LMM1[2,3], AnovaGC.LMM2[2,3], AnovaGC.LMM3[2,3], AnovaGC.LMM4[2,3], AnovaGC.LMM5[2,3], AnovaGC.LMM6[2,3]))
@@ -316,17 +215,7 @@ detach("package:lmerTest", unload=TRUE)
 ### Time-lagged NEO LMMs
 
 ```{r}
-NEOunmatched<-read.csv("~/Google Drive/Projects/Masters/rhesus-sociality-fGC-uNEO/NEOunmatched.csv", h=T)
-
-NEOunmatched <- NEOunmatched %>%
-  mutate(NEO_SampleNo = SampleNo) %>%
-  select(NEO_SampleNo, Time)
-  
 TL_NEO<-read.csv("~/Google Drive/Projects/Masters/R input sheets/Time-lagged_NEO.csv", h=T)
-
-TL_NEO <- left_join(TL_NEO, NEOunmatched)
-TL_NEO$Time <- as.POSIXct(TL_NEO$Time,format="%I:%M %p")
-TL_NEO$Time <- as.hms(TL_NEO$Time)
 ```
 
 
@@ -338,104 +227,79 @@ vif(NEO.TL.LMM1)
 plot(fitted(NEO.TL.LMM1), resid(NEO.TL.LMM1))
 qqnorm(resid(NEO.TL.LMM1))
 summary(NEO.TL.LMM1)
-Anova(NEO.TL.LMM1)
+AnovaNEO.TL.LMM1 <- Anova(NEO.TL.LMM1, type= "III")
 anova(NEO.TL.LMM1, NEO.TL.LMM1.red)
 ```
 
 
 ```{r}
 NEO.TL.LMM2=lmer(log(NEO.CR)~ FreqTotalGR + RelRank +  (1|ID) +(1|Month), data=TL_NEO)
+NEO.TL.LMM2.red=lmer(log(NEO.CR)~ RelRank +  (1|ID) +(1|Month), data=TL_NEO)
 
+
+vif(NEO.TL.LMM2)
+plot(fitted(NEO.TL.LMM2), resid(NEO.TL.LMM2))
+qqnorm(resid(NEO.TL.LMM2))
 summary(NEO.TL.LMM2)
-Anova(NEO.TL.LMM2)
+AnovaNEO.TL.LMM2 <- Anova(NEO.TL.LMM2, type= "III")
+anova(NEO.TL.LMM2, NEO.TL.LMM2.red)
 ```
 
 
 ```{r}
 NEO.TL.LMM3=lmer(log(NEO.CR)~ FreqGRRec + RelRank + (1|ID) +(1|Month), data=TL_NEO)
+NEO.TL.LMM3.red=lmer(log(NEO.CR)~ RelRank + (1|ID) +(1|Month), data=TL_NEO)
+
+
+vif(NEO.TL.LMM3)
+plot(fitted(NEO.TL.LMM3), resid(NEO.TL.LMM3))
+qqnorm(resid(NEO.TL.LMM3))
+summary(NEO.TL.LMM3)
+AnovaNEO.TL.LMM3 <- Anova(NEO.TL.LMM3, type= "III")
+anova(NEO.TL.LMM3, NEO.TL.LMM3.red)
+```
+
+
+```{r}
 NEO.TL.LMM4=lmer(log(NEO.CR)~ FreqGRGiven + RelRank + (1|ID) +(1|Month), data=TL_NEO)
+NEO.TL.LMM4.red=lmer(log(NEO.CR)~ RelRank + (1|ID) +(1|Month), data=TL_NEO)
+
+
+vif(NEO.TL.LMM4)
+plot(fitted(NEO.TL.LMM4), resid(NEO.TL.LMM4))
+qqnorm(resid(NEO.TL.LMM4))
+summary(NEO.TL.LMM4)
+AnovaNEO.TL.LMM4 <- Anova(NEO.TL.LMM4, type= "III")
+anova(NEO.TL.LMM4, NEO.TL.LMM4.red)
+```
+
+
+```{r}
 NEO.TL.LMM5=lmer(log(NEO.CR)~ FreqTimeSpentCop + RelRank + (1|ID) + (1|Month), data=TL_NEO)
+NEO.TL.LMM5.red=lmer(log(NEO.CR)~ RelRank + (1|ID) + (1|Month), data=TL_NEO)
+
+vif(NEO.TL.LMM5)
+plot(fitted(NEO.TL.LMM5), resid(NEO.TL.LMM5))
+qqnorm(resid(NEO.TL.LMM5))
+summary(NEO.TL.LMM5)
+AnovaNEO.TL.LMM5 <- Anova(NEO.TL.LMM5, type= "III")
+anova(NEO.TL.LMM5, NEO.TL.LMM5.red)
+```
+
+
+```{r}
 NEO.TL.LMM6=lmer(log(NEO.CR)~ FreqTimeSpentConsort + RelRank + (1|ID) +(1|Month), data=TL_NEO)
+NEO.TL.LMM6.red=lmer(log(NEO.CR)~ RelRank + (1|ID) +(1|Month), data=TL_NEO)
+
+vif(NEO.TL.LMM6)
+plot(fitted(NEO.TL.LMM6), resid(NEO.TL.LMM6))
+qqnorm(resid(NEO.TL.LMM6))
+summary(NEO.TL.LMM6)
+AnovaNEO.TL.LMM6 <- Anova(NEO.TL.LMM6, type= "III")
+anova(NEO.TL.LMM6, NEO.TL.LMM6.red)
 ```
 
 ### Time-lagged NEO LMM summaries
-#### Fixed Effect variable: FreqAllProx
-```{r echo=FALSE}
-NEO.TL.LMM1=lmer(log(NEO.CR)~ FreqAllProx + RelRank + (1|ID) + (1|Month), data=TL_NEO)
-summary(NEO.TL.LMM1)
-AnovaNEO.TL.LMM1 <-Anova(NEO.TL.LMM1, type="III"); AnovaNEO.TL.LMM1
-```
-
-<div class = "yellow">
-```{r echo=FALSE, class.source="yellow"}
-cat("p=", AnovaNEO.TL.LMM1[2,3], ifelse(AnovaNEO.TL.LMM1[2,3]<0.05, red("**SIGNIFICANT**"), "non-significant"))
-```
-</div>
-
-#### Fixed Effect variable: FreqTotalGR
-```{r echo=FALSE}
-NEO.TL.LMM2=lmer(log(NEO.CR)~ FreqTotalGR + RelRank + (1|ID) +(1|Month), data=TL_NEO)
-summary(NEO.TL.LMM2)
-AnovaNEO.TL.LMM2 <- Anova(NEO.TL.LMM2, type="III"); AnovaNEO.TL.LMM2
-```
-
-<div class = "yellow">
-```{r echo=FALSE}
-cat("p=", AnovaNEO.TL.LMM2[2,3], ifelse(AnovaNEO.TL.LMM2[2,3]<0.05, red("**SIGNIFICANT**"), "non-significant"))
-```
-</div>
-
-#### Fixed Effect variable: FreqGRRec
-```{r echo=FALSE}
-NEO.TL.LMM3=lmer(log(NEO.CR)~ FreqGRRec + RelRank + (1|ID) +(1|Month), data=TL_NEO)
-summary(NEO.TL.LMM3)
-AnovaNEO.TL.LMM3 <-Anova(NEO.TL.LMM3, type="III"); AnovaNEO.TL.LMM3
-```
-
-<div class = "yellow">
-```{r echo=FALSE}
-cat("p=", AnovaNEO.TL.LMM3[2,3], ifelse(AnovaNEO.TL.LMM3[2,3]<0.05, "**SIGNIFICANT**", "non-significant"))
-```
-</div>
-
-#### Fixed Effect variable: FreqGRGiven
-```{r}
-NEO.TL.LMM4=lmer(log(NEO.CR)~ FreqGRGiven + RelRank + (1|ID) +(1|Month), data=TL_NEO)
-summary(NEO.TL.LMM4)
-AnovaNEO.TL.LMM4 <- Anova(NEO.TL.LMM4, type="III"); AnovaNEO.TL.LMM4
-```
-
-<div class = "yellow">
-```{r echo=FALSE}
-cat("p=", AnovaNEO.TL.LMM4[2,3], ifelse(AnovaNEO.TL.LMM4[2,3]<0.05, red("**SIGNIFICANT**"), "non-significant"))
-```
-</div>
-
-#### Fixed Effect variable: FreqTimeSpentCop
-```{r}
-NEO.TL.LMM5=lmer(log(NEO.CR)~ FreqTimeSpentCop + RelRank + (1|ID) +(1|Month), data=TL_NEO)
-summary(NEO.TL.LMM5)
-AnovaNEO.TL.LMM5<- Anova(NEO.TL.LMM5, type="III"); AnovaNEO.TL.LMM5
-```
-
-<div class = "yellow">
-```{r echo=FALSE}
-cat("p=", AnovaNEO.TL.LMM5[2,3], ifelse(AnovaNEO.TL.LMM5[2,3]<0.05, red("**SIGNIFICANT**"), "non-significant"))
-```
-</div>
-
-#### Fixed Effect variable: FreqTimeSpentConsort
-```{r}
-NEO.TL.LMM6=lmer(log(NEO.CR)~ FreqTimeSpentConsort + RelRank + (1|ID) +(1|Month), data=TL_NEO)
-summary(NEO.TL.LMM6)
-AnovaNEO.TL.LMM6<- Anova(NEO.TL.LMM6, type="III"); AnovaNEO.TL.LMM6
-```
-
-<div class = "yellow">
-```{r echo=FALSE}
-cat("p=", AnovaNEO.TL.LMM6[2,3], ifelse(AnovaNEO.TL.LMM6[2,3]<0.05, red("**SIGNIFICANT**"), "non-significant")) 
-```
-</div>
 
 ### Summary of Wald Chi-square p-values for Fixed Effects
 ```{r echo=FALSE}
@@ -510,91 +374,82 @@ Concurrent_NEO<-read.csv("~/Google Drive/Projects/Masters/R input sheets/Concurr
 
 ```{r}
 NEO.Con.LMM1=lmer(log(NEO.CR)~ FreqAllProx  + RelRank + (1|ID) + (1|Month), data=Concurrent_NEO)
+NEO.Con.LMM1.red=lmer(log(NEO.CR)~ RelRank + (1|ID) + (1|Month), data=Concurrent_NEO)
+
+vif(NEO.Con.LMM1)
+plot(fitted(NEO.Con.LMM1), resid(NEO.Con.LMM1))
+qqnorm(resid(NEO.Con.LMM1))
+summary(NEO.Con.LMM1)
+AnovaNEO.Con.LMM1 <- Anova(NEO.Con.LMM1, type= "III")
+anova(NEO.Con.LMM1, NEO.Con.LMM1.red)
+```
+
+
+```{r}
 NEO.Con.LMM2=lmer(log(NEO.CR)~ FreqTotalGR + RelRank +  (1|ID) +(1|Month), data=Concurrent_NEO)
+NEO.Con.LMM2.red=lmer(log(NEO.CR)~ RelRank +  (1|ID) +(1|Month), data=Concurrent_NEO)
+
+vif(NEO.Con.LMM2)
+plot(fitted(NEO.Con.LMM2), resid(NEO.Con.LMM2))
+qqnorm(resid(NEO.Con.LMM2))
+summary(NEO.Con.LMM2)
+AnovaNEO.Con.LMM2 <- Anova(NEO.Con.LMM2, type= "III")
+anova(NEO.Con.LMM2, NEO.Con.LMM2.red)
+```
+
+
+```{r}
 NEO.Con.LMM3=lmer(log(NEO.CR)~ FreqGRRec + RelRank + (1|ID) +(1|Month), data=Concurrent_NEO)
+NEO.Con.LMM3.red=lmer(log(NEO.CR)~  RelRank + (1|ID) +(1|Month), data=Concurrent_NEO)
+
+vif(NEO.Con.LMM3)
+plot(fitted(NEO.Con.LMM3), resid(NEO.Con.LMM3))
+qqnorm(resid(NEO.Con.LMM3))
+summary(NEO.Con.LMM3)
+AnovaNEO.Con.LMM3 <- Anova(NEO.Con.LMM3, type= "III")
+anova(NEO.Con.LMM3, NEO.Con.LMM3.red)
+```
+
+
+```{r}
 NEO.Con.LMM4=lmer(log(NEO.CR)~ FreqGRGiven + RelRank + (1|ID) +(1|Month), data=Concurrent_NEO)
+NEO.Con.LMM4.red=lmer(log(NEO.CR)~ RelRank + (1|ID) +(1|Month), data=Concurrent_NEO)
+
+vif(NEO.Con.LMM4)
+plot(fitted(NEO.Con.LMM4), resid(NEO.Con.LMM4))
+qqnorm(resid(NEO.Con.LMM4))
+summary(NEO.Con.LMM4)
+AnovaNEO.Con.LMM4 <- Anova(NEO.Con.LMM4, type= "III")
+anova(NEO.Con.LMM4, NEO.Con.LMM4.red)
+```
+
+
+```{r}
 NEO.Con.LMM5=lmer(log(NEO.CR)~ FreqTimeSpentCop + RelRank + (1|ID) +(1|Month), data=Concurrent_NEO)
+NEO.Con.LMM5.red=lmer(log(NEO.CR)~ RelRank + (1|ID) +(1|Month), data=Concurrent_NEO)
+
+vif(NEO.Con.LMM5)
+plot(fitted(NEO.Con.LMM5), resid(NEO.Con.LMM5))
+qqnorm(resid(NEO.Con.LMM5))
+summary(NEO.Con.LMM5)
+AnovaNEO.Con.LMM5 <- Anova(NEO.Con.LMM5, type= "III")
+anova(NEO.Con.LMM5, NEO.Con.LMM5.red)
+```
+
+
+```{r}
 NEO.Con.LMM6=lmer(log(NEO.CR)~ FreqTimeSpentConsort + RelRank + (1|ID) +(1|Month), data=Concurrent_NEO)
+NEO.Con.LMM6.red=lmer(log(NEO.CR)~ RelRank + (1|ID) +(1|Month), data=Concurrent_NEO)
+
+vif(NEO.Con.LMM6)
+plot(fitted(NEO.Con.LMM6), resid(NEO.Con.LMM6))
+qqnorm(resid(NEO.Con.LMM6))
+summary(NEO.Con.LMM6)
+AnovaNEO.Con.LMM6 <- Anova(NEO.Con.LMM6, type= "III")
+anova(NEO.Con.LMM6, NEO.Con.LMM6.red)
 ```
 
 ### Concurrent NEO LMM summaries
-#### Fixed Effect variable: FreqAllProx
-```{r echo=FALSE}
-NEO.Con.LMM1=lmer(log(NEO.CR)~ FreqAllProx + RelRank + (1|ID) + (1|Month), data=Concurrent_NEO)
-summary(NEO.Con.LMM1)
-AnovaNEO.Con.LMM1 <-Anova(NEO.Con.LMM1, type="III"); AnovaNEO.Con.LMM1
-```
-
-<div class = "yellow">
-```{r echo=FALSE, class.source="yellow"}
-cat("p=", AnovaNEO.Con.LMM1[2,3], ifelse(AnovaNEO.Con.LMM1[2,3]<0.05, red("**SIGNIFICANT**"), "non-significant"))
-```
-</div>
-
-#### Fixed Effect variable: FreqTotalGR
-```{r echo=FALSE}
-NEO.Con.LMM2=lmer(log(NEO.CR)~ FreqTotalGR + RelRank + (1|ID) +(1|Month), data=Concurrent_NEO)
-summary(NEO.Con.LMM2)
-AnovaNEO.Con.LMM2 <- Anova(NEO.Con.LMM2, type="III"); AnovaNEO.Con.LMM2
-```
-
-<div class = "yellow">
-```{r echo=FALSE}
-cat("p=", AnovaNEO.Con.LMM2[2,3], ifelse(AnovaNEO.Con.LMM2[2,3]<0.05, red("**SIGNIFICANT**"), "non-significant"))
-```
-</div>
-
-#### Fixed Effect variable: FreqGRRec
-```{r echo=FALSE}
-NEO.Con.LMM3=lmer(log(NEO.CR)~ FreqGRRec + RelRank + (1|ID) +(1|Month), data=Concurrent_NEO)
-summary(NEO.Con.LMM3)
-AnovaNEO.Con.LMM3 <-Anova(NEO.Con.LMM3, type="III"); AnovaNEO.Con.LMM3
-```
-
-<div class = "yellow">
-```{r echo=FALSE}
-cat("p=", AnovaNEO.Con.LMM3[2,3], ifelse(AnovaNEO.Con.LMM3[2,3]<0.05, "**SIGNIFICANT**", "non-significant"))
-```
-</div>
-
-#### Fixed Effect variable: FreqGRGiven
-```{r}
-NEO.Con.LMM4=lmer(log(NEO.CR)~ FreqGRGiven + RelRank + (1|ID) +(1|Month), data=Concurrent_NEO)
-summary(NEO.Con.LMM4)
-AnovaNEO.Con.LMM4 <- Anova(NEO.Con.LMM4, type="III"); AnovaNEO.Con.LMM4
-```
-
-<div class = "yellow">
-```{r echo=FALSE}
-cat("p=", AnovaNEO.Con.LMM4[2,3], ifelse(AnovaNEO.Con.LMM4[2,3]<0.05, red("**SIGNIFICANT**"), "non-significant"))
-```
-</div>
-
-#### Fixed Effect variable: FreqTimeSpentCop
-```{r}
-NEO.Con.LMM5=lmer(log(NEO.CR)~ FreqTimeSpentCop + RelRank + (1|ID) +(1|Month), data=Concurrent_NEO)
-summary(NEO.Con.LMM5)
-AnovaNEO.Con.LMM5<- Anova(NEO.Con.LMM5, type="III"); AnovaNEO.Con.LMM5
-```
-
-<div class = "yellow">
-```{r echo=FALSE}
-cat("p=", AnovaNEO.Con.LMM5[2,3], ifelse(AnovaNEO.Con.LMM5[2,3]<0.05, red("**SIGNIFICANT**"), "non-significant"))
-```
-</div>
-
-#### Fixed Effect variable: FreqTimeSpentConsort
-```{r}
-NEO.Con.LMM6=lmer(log(NEO.CR)~ FreqTimeSpentConsort + RelRank + (1|ID) +(1|Month), data=Concurrent_NEO)
-summary(NEO.Con.LMM6)
-AnovaNEO.Con.LMM6<- Anova(NEO.Con.LMM6, type="III"); AnovaNEO.Con.LMM6
-```
-
-<div class = "yellow">
-```{r echo=FALSE}
-cat("p=", AnovaNEO.Con.LMM6[2,3], ifelse(AnovaNEO.Con.LMM6[2,3]<0.05, red("**SIGNIFICANT**"), "non-significant")) 
-```
-</div>
 
 ### Summary of Wald Chi-square p-values for Fixed Effects
 ```{r echo=FALSE}
@@ -674,23 +529,10 @@ pairedNEO<-read.csv("~/Google Drive/Projects/Masters/R input sheets/NEO_paired_t
 GCPairedt.test <- t.test(pairedGC$Early, pairedGC$Late, paired=TRUE); GCPairedt.test
 ```
 
-<div class = "yellow">
-```{r echo=FALSE}
-cat("p= ",GCPairedt.test$p.value, ": non-significant difference between GCs early and late in the mating season.")
-```
-</div>
-
 ### Paired t-test Early vs. Late NEO
 ```{r}
 NEOPairedt.test <- t.test(pairedNEO$Early, pairedNEO$Late, paired=TRUE); NEOPairedt.test
 ```
-
-<div class = "yellow">
-```{r echo=FALSE}
-cat("p= ",NEOPairedt.test$p.value, ": NEO significantly higher late in the mating season.")
-```
-</div>
-
 
 ```{r echo=FALSE}
 t.test.results<- data.frame(Marker= c("GC", "NEO"), t_value= c(GCPairedt.test$statistic, NEOPairedt.test$statistic), Mean_difference= c(GCPairedt.test$estimate, NEOPairedt.test$estimate), CI_low = c(GCPairedt.test$conf.int[2], NEOPairedt.test$conf.int[2]), CI_high= c(GCPairedt.test$conf.int[1], NEOPairedt.test$conf.int[1]), P_value= c(GCPairedt.test$p.value, NEOPairedt.test$p.value)); t.test.results
@@ -714,23 +556,17 @@ NEOunmatched <- read.csv("~/Google Drive/Projects/Masters/rhesus-sociality-fGC-u
 Hierarchy <- read.csv("~/Google Drive/Projects/Masters/rhesus-sociality-fGC-uNEO/Rhierarchy52.csv")
 
 NEOunmatched <- NEOunmatched %>%
-  rename(Focal.ID = Animal.ID) %>%
-  filter(Time != "")
-
+  rename(Focal.ID = Animal.ID) 
 
 HierarchyTidy <- Hierarchy %>%
-  select(ID, RelRank) %>%
+  dplyr::select(ID, RelRank) %>%
   rename(Focal.ID= ID)
-
 
 
 GC <- left_join(GCunmatched, HierarchyTidy)
 NEO <- left_join(NEOunmatched, HierarchyTidy)
 
 NEO$Date <- mdy(NEO$Date)
-
-NEO$Time <- as.POSIXct(NEO$Time,format="%I:%M %p")
-NEO$Time <- as.hms(NEO$Time)
 ```
 
 ```{r}
@@ -739,21 +575,19 @@ NEOnoJan <- NEO %>%
 
 GCmod <- lmer(log(final.conc) ~ Month + RelRank + (1|Focal.ID), data=GC)
 summary(GCmod)
+AnovaGC.Month <- Anova(GCmod, type= "III")
 
 NEOmod <- lmer(log(NEO.CR) ~ Month  + RelRank + (1 |Focal.ID), data= NEO)
 summary(NEOmod)
-Anova(NEOmod)
+AnovaNEO.Month <- Anova(NEOmod, type= "III")
 
 NEOmod.red <- lmer(log(NEO.CR) ~ RelRank + (1 |Focal.ID), data= NEO)
-summary(NEOmod)
-
+summary(NEOmod.red)
 anova(NEOmod, NEOmod.red, type= "III")
-
-NEOdatemod <- lmer(log(NEO.CR) ~ Date + RelRank + (1 |Focal.ID), data= NEO)
-summary(NEOdatemod)
 
 NEOnoJanmod <- lmer(log(NEO.CR) ~ Month + RelRank + (1 |Focal.ID), data= NEOnoJan)
 summary(NEOnoJanmod)
+AnovaNEO.MonthNOJAN <- Anova(NEOnoJanmod, type= "III")
 ```
 
 
@@ -761,38 +595,36 @@ summary(NEOnoJanmod)
 
 ### Obj1 table
 ```{r echo=FALSE}
+Obj1.Summary <-data.frame(Response_variable = c("fGC (n=163)", "", "", "", "Time-lagged uNEO (n=213)", "", "", "", "Concurrent uNEO (n=267)", "", "", ""), Fixed_Effect = c("Proximity", "Total Grooming", "Receiving Grooming", "Giving Grooming", "Proximity", "Total Grooming", "Receiving Grooming", "Giving Grooming", "Proximity", "Total Grooming", "Receiving Grooming", "Giving Grooming"), "Estimate" = c(summary(GC.LMM1)$coef[2,"Estimate"], summary(GC.LMM2)$coef[2,"Estimate"], summary(GC.LMM3)$coef[2,"Estimate"], summary(GC.LMM4)$coef[2,"Estimate"], summary(NEO.TL.LMM1)$coef[2,"Estimate"], summary(NEO.TL.LMM2)$coef[2,"Estimate"], summary(NEO.TL.LMM3)$coef[2,"Estimate"], summary(NEO.TL.LMM4)$coef[2,"Estimate"], summary(NEO.Con.LMM1)$coef[2,"Estimate"], summary(NEO.Con.LMM2)$coef[2,"Estimate"], summary(NEO.Con.LMM3)$coef[2,"Estimate"], summary(NEO.Con.LMM4)$coef[2,"Estimate"]), Std_Error= c(summary(GC.LMM1)$coef[2, "Std. Error"], summary(GC.LMM2)$coef[2, "Std. Error"], summary(GC.LMM3)$coef[2, "Std. Error"], summary(GC.LMM4)$coef[2, "Std. Error"],summary(NEO.TL.LMM1)$coef[2,"Std. Error"], summary(NEO.TL.LMM2)$coef[2,"Std. Error"], summary(NEO.TL.LMM3)$coef[2,"Std. Error"], summary(NEO.TL.LMM4)$coef[2,"Std. Error"], summary(NEO.Con.LMM1)$coef[2,"Std. Error"], summary(NEO.Con.LMM2)$coef[2,"Std. Error"], summary(NEO.Con.LMM3)$coef[2,"Std. Error"], summary(NEO.Con.LMM4)$coef[2,"Std. Error"]), t_value= c(summary(GC.LMM1)$coef[2, "t value"], summary(GC.LMM2)$coef[2, "t value"], summary(GC.LMM3)$coef[2, "t value"], summary(GC.LMM4)$coef[2, "t value"], summary(NEO.TL.LMM1)$coef[2,"t value"], summary(NEO.TL.LMM2)$coef[2,"t value"], summary(NEO.TL.LMM3)$coef[2,"t value"], summary(NEO.TL.LMM4)$coef[2,"t value"], summary(NEO.Con.LMM1)$coef[2,"t value"], summary(NEO.Con.LMM2)$coef[2,"t value"], summary(NEO.Con.LMM3)$coef[2,"t value"], summary(NEO.Con.LMM4)$coef[2,"t value"]), Walds_Chi_square= c(AnovaGC.LMM1[2,1], AnovaGC.LMM2[2,1], AnovaGC.LMM3[2,1], AnovaGC.LMM4[2,1], AnovaNEO.TL.LMM1[2,1], AnovaNEO.TL.LMM2[2,1], AnovaNEO.TL.LMM3[2,1], AnovaNEO.TL.LMM4[2,1], AnovaNEO.Con.LMM1[2,1], AnovaNEO.Con.LMM2[2,1], AnovaNEO.Con.LMM3[2,1], AnovaNEO.Con.LMM4[2,1]), P_value = c(AnovaGC.LMM1[2,3], AnovaGC.LMM2[2,3], AnovaGC.LMM3[2,3], AnovaGC.LMM4[2,3], AnovaNEO.TL.LMM1[2,3], AnovaNEO.TL.LMM2[2,3], AnovaNEO.TL.LMM3[2,3], AnovaNEO.TL.LMM4[2,3], AnovaNEO.Con.LMM1[2,3], AnovaNEO.Con.LMM2[2,3], AnovaNEO.Con.LMM3[2,3], AnovaNEO.Con.LMM4[2,3]))
+```
 
-Obj1.Summary <-data.frame(Response_variable = c("fGC", "", "", "", "Time-lagged uNEO", "", "", "", "Concurrent uNEO", "", "", ""), Fixed_Effect = c("Proximity", "Total Grooming", "Receiving Grooming", "Giving Grooming", "Proximity", "Total Grooming", "Receiving Grooming", "Giving Grooming", "Proximity", "Total Grooming", "Receiving Grooming", "Giving Grooming"), "Estimate" = c(summary(GC.LMM1)$coef[2,"Estimate"], summary(GC.LMM2)$coef[2,"Estimate"], summary(GC.LMM3)$coef[2,"Estimate"], summary(GC.LMM4)$coef[2,"Estimate"], summary(NEO.TL.LMM1)$coef[2,"Estimate"], summary(NEO.TL.LMM2)$coef[2,"Estimate"], summary(NEO.TL.LMM3)$coef[2,"Estimate"], summary(NEO.TL.LMM4)$coef[2,"Estimate"], summary(NEO.Con.LMM1)$coef[2,"Estimate"], summary(NEO.Con.LMM2)$coef[2,"Estimate"], summary(NEO.Con.LMM3)$coef[2,"Estimate"], summary(NEO.Con.LMM4)$coef[2,"Estimate"]), Std_Error= c(summary(GC.LMM1)$coef[2, "Std. Error"], summary(GC.LMM2)$coef[2, "Std. Error"], summary(GC.LMM3)$coef[2, "Std. Error"], summary(GC.LMM4)$coef[2, "Std. Error"],summary(NEO.TL.LMM1)$coef[2,"Std. Error"], summary(NEO.TL.LMM2)$coef[2,"Std. Error"], summary(NEO.TL.LMM3)$coef[2,"Std. Error"], summary(NEO.TL.LMM4)$coef[2,"Std. Error"], summary(NEO.Con.LMM1)$coef[2,"Std. Error"], summary(NEO.Con.LMM2)$coef[2,"Std. Error"], summary(NEO.Con.LMM3)$coef[2,"Std. Error"], summary(NEO.Con.LMM4)$coef[2,"Std. Error"]), t_value= c(summary(GC.LMM1)$coef[2, "t value"], summary(GC.LMM2)$coef[2, "t value"], summary(GC.LMM3)$coef[2, "t value"], summary(GC.LMM4)$coef[2, "t value"], summary(NEO.TL.LMM1)$coef[2,"t value"], summary(NEO.TL.LMM2)$coef[2,"t value"], summary(NEO.TL.LMM3)$coef[2,"t value"], summary(NEO.TL.LMM4)$coef[2,"t value"], summary(NEO.Con.LMM1)$coef[2,"t value"], summary(NEO.Con.LMM2)$coef[2,"t value"], summary(NEO.Con.LMM3)$coef[2,"t value"], summary(NEO.Con.LMM4)$coef[2,"t value"]), Walds_Chi_square= c(AnovaGC.LMM1[2,1], AnovaGC.LMM2[2,1], AnovaGC.LMM3[2,1], AnovaGC.LMM4[2,1], AnovaNEO.TL.LMM1[2,1], AnovaNEO.TL.LMM2[2,1], AnovaNEO.TL.LMM3[2,1], AnovaNEO.TL.LMM4[2,1], AnovaNEO.Con.LMM1[2,1], AnovaNEO.Con.LMM2[2,1], AnovaNEO.Con.LMM3[2,1], AnovaNEO.Con.LMM4[2,1]), P_value = c(AnovaGC.LMM1[2,3], AnovaGC.LMM2[2,3], AnovaGC.LMM3[2,3], AnovaGC.LMM4[2,3], AnovaNEO.TL.LMM1[2,3], AnovaNEO.TL.LMM2[2,3], AnovaNEO.TL.LMM3[2,3], AnovaNEO.TL.LMM4[2,3], AnovaNEO.Con.LMM1[2,3], AnovaNEO.Con.LMM2[2,3], AnovaNEO.Con.LMM3[2,3], AnovaNEO.Con.LMM4[2,3]))
 
-Obj1.Summary <- Obj1.Summary %>%
+```{r echo=FALSE}
+Obj1.Summary.Kable <- Obj1.Summary %>%
   mutate_if(is.numeric, round, 3) %>%
   mutate(P_value = cell_spec(P_value, "html", bold = ifelse(P_value > 0.05, FALSE, TRUE), color= ifelse(P_value > 0.05, "gray", "black"))) %>%
   rename("P-value" = P_value, "Wald's χ2" = Walds_Chi_square, "t-value" = t_value, "Std. Error"= Std_Error, "Fixed Effect*"= Fixed_Effect, "Response Variable"= Response_variable) %>%
   kable(format="html", escape = F) %>%
   kable_styling("striped", full_width=TRUE) %>%
   pack_rows(index = c("Objective 1.1" = 4, "Objective 1.2" = 8)) %>%
-  column_spec(1, color = "black") %>%
-  column_spec(2, color = "black") %>%
   footnote(general = "*All models include male dominance rank as a covariate",
            general_title = "") %>%
-  save_kable("Table1.pdf")
+  save_kable("Table1.pdf") 
 
 #Save as width 900 height 570
 ```
 
 ### Obj 2 table
 ```{r echo=FALSE}
-Obj2.Summary <-data.frame(Response_variable = c("fGC", "", "Time-lagged uNEO", "", "Concurrent uNEO", ""), Fixed_Effect = c("Copulation", "Consort", "Copulation", "Consort", "Copulation", "Consort"), "Estimate" = c(summary(GC.LMM5)$coef[2,"Estimate"], summary(GC.LMM6)$coef[2,"Estimate"],  summary(NEO.TL.LMM5)$coef[2,"Estimate"], summary(NEO.TL.LMM6)$coef[2,"Estimate"],  summary(NEO.Con.LMM5)$coef[2,"Estimate"], summary(NEO.Con.LMM6)$coef[2,"Estimate"]), Std_Error= c(summary(GC.LMM5)$coef[2, "Std. Error"], summary(GC.LMM6)$coef[2, "Std. Error"], summary(NEO.TL.LMM5)$coef[2,"Std. Error"], summary(NEO.TL.LMM6)$coef[2,"Std. Error"], summary(NEO.Con.LMM5)$coef[2,"Std. Error"], summary(NEO.Con.LMM6)$coef[2,"Std. Error"]), t_value= c(summary(GC.LMM5)$coef[2, "t value"], summary(GC.LMM6)$coef[2, "t value"], summary(NEO.TL.LMM5)$coef[2,"t value"], summary(NEO.TL.LMM6)$coef[2,"t value"], summary(NEO.Con.LMM5)$coef[2,"t value"], summary(NEO.Con.LMM6)$coef[2,"t value"]), Walds_Chi_square= c(AnovaGC.LMM5[2,1], AnovaGC.LMM6[2,1], AnovaNEO.TL.LMM5[2,1], AnovaNEO.TL.LMM6[2,1], AnovaNEO.Con.LMM5[2,1], AnovaNEO.Con.LMM6[2,1]), P_value = c(AnovaGC.LMM5[2,3], AnovaGC.LMM6[2,3], AnovaNEO.TL.LMM5[2,3], AnovaNEO.TL.LMM6[2,3], AnovaNEO.Con.LMM5[2,3], AnovaNEO.Con.LMM6[2,3]))
+Obj2.Summary <-data.frame(Response_variable = c("fGC (n=163)", "", "Time-lagged uNEO (n=213)", "", "Concurrent uNEO (n=267)", ""), Fixed_Effect = c("Copulation", "Consort", "Copulation", "Consort", "Copulation", "Consort"), "Estimate" = c(summary(GC.LMM5)$coef[2,"Estimate"], summary(GC.LMM6)$coef[2,"Estimate"],  summary(NEO.TL.LMM5)$coef[2,"Estimate"], summary(NEO.TL.LMM6)$coef[2,"Estimate"],  summary(NEO.Con.LMM5)$coef[2,"Estimate"], summary(NEO.Con.LMM6)$coef[2,"Estimate"]), Std_Error= c(summary(GC.LMM5)$coef[2, "Std. Error"], summary(GC.LMM6)$coef[2, "Std. Error"], summary(NEO.TL.LMM5)$coef[2,"Std. Error"], summary(NEO.TL.LMM6)$coef[2,"Std. Error"], summary(NEO.Con.LMM5)$coef[2,"Std. Error"], summary(NEO.Con.LMM6)$coef[2,"Std. Error"]), t_value= c(summary(GC.LMM5)$coef[2, "t value"], summary(GC.LMM6)$coef[2, "t value"], summary(NEO.TL.LMM5)$coef[2,"t value"], summary(NEO.TL.LMM6)$coef[2,"t value"], summary(NEO.Con.LMM5)$coef[2,"t value"], summary(NEO.Con.LMM6)$coef[2,"t value"]), Walds_Chi_square= c(AnovaGC.LMM5[2,1], AnovaGC.LMM6[2,1], AnovaNEO.TL.LMM5[2,1], AnovaNEO.TL.LMM6[2,1], AnovaNEO.Con.LMM5[2,1], AnovaNEO.Con.LMM6[2,1]), P_value = c(AnovaGC.LMM5[2,3], AnovaGC.LMM6[2,3], AnovaNEO.TL.LMM5[2,3], AnovaNEO.TL.LMM6[2,3], AnovaNEO.Con.LMM5[2,3], AnovaNEO.Con.LMM6[2,3]))
 
-Obj2.Summary <- Obj2.Summary %>%  
+Obj2.Summary.Kable <- Obj2.Summary %>%  
   mutate_if(is.numeric, round, 3) %>%
   mutate(P_value = cell_spec(P_value, "html", bold = ifelse(P_value > 0.05, FALSE, TRUE), color= ifelse(P_value > 0.05, "gray", "black"))) %>%
   rename("P-value" = P_value, "Wald's χ2" = Walds_Chi_square, "t-value" = t_value, "Std. Error"= Std_Error, "Fixed Effect*"= Fixed_Effect, "Response Variable"= Response_variable) %>%
   kable(format="html", escape = F) %>%
   kable_styling("striped", full_width=TRUE) %>%
   pack_rows(index = c("Objective 2.1" = 2, "Objective 2.2" = 4)) %>%
-  column_spec(1, color = "black") %>%
-  column_spec(2, color = "black") %>%
   footnote(general = "*All models include rank as a covariate",
            general_title = "") %>%
   save_kable("Table2.pdf")
@@ -802,18 +634,21 @@ Obj2.Summary <- Obj2.Summary %>%
 
 ### Obj 3 table
 ```{r echo=FALSE}
-t.test.results<- data.frame(Marker= c("fGC", "uNEO"), t_value= c(GCPairedt.test$statistic, NEOPairedt.test$statistic), Mean_difference= c(GCPairedt.test$estimate, NEOPairedt.test$estimate), CI_high = c(GCPairedt.test$conf.int[2], NEOPairedt.test$conf.int[2]), CI_low= c(GCPairedt.test$conf.int[1], NEOPairedt.test$conf.int[1]), P_value= c(GCPairedt.test$p.value, NEOPairedt.test$p.value))
+Obj3.Summary <-data.frame(Response_variable = c("fGC (n=195)", "uNEO (n=324)", "uNEO w/o Jan (n=300)"), Fixed_Effect = c("Month", "Month", "Month"), "Estimate" = c(summary(GCmod)$coef[2,"Estimate"], summary(NEOmod)$coef[2,"Estimate"],  summary(NEOnoJanmod)$coef[2,"Estimate"]), Std_Error= c(summary(GCmod)$coef[2, "Std. Error"], summary(NEOmod)$coef[2, "Std. Error"], summary(NEOnoJanmod)$coef[2,"Std. Error"]), t_value= c(summary(GCmod)$coef[2, "t value"], summary(NEOmod)$coef[2, "t value"], summary(NEOnoJanmod)$coef[2,"t value"]), Walds_Chi_square= c(AnovaGC.Month[2,1], AnovaNEO.Month[2,1], AnovaNEO.MonthNOJAN[2,1]), P_value = c(round(AnovaGC.Month[2,3], digits= 3), "<0.001", "<0.001"))
+```
 
-t.test.results <- t.test.results %>%  
+
+```{r echo=FALSE}
+Obj3.Summary.Kable <- Obj3.Summary %>%  
   mutate_if(is.numeric, round, 3) %>%
   mutate(P_value = cell_spec(P_value, "html", bold = ifelse(P_value > 0.05, FALSE, TRUE), color= ifelse(P_value > 0.05, "gray", "black"))) %>%
-  rename(" "= Marker, "P-value" = P_value, "Mean difference" = Mean_difference, "t-value" = t_value, "95% CI (high)"= CI_high, "95% CI (low)"= CI_low) %>%
+  rename("P-value" = P_value, "Wald's χ2" = Walds_Chi_square, "t-value" = t_value, "Std. Error"= Std_Error, "Fixed Effect*"= Fixed_Effect, "Response Variable"= Response_variable) %>%
   kable(format="html", escape = F) %>%
   kable_styling("striped", full_width=TRUE) %>%
-  column_spec(1, color = "black") %>%
   pack_rows(index = c("Objective 3.1" = 1, "Objective 3.2" = 1)) %>%
-  kable_save("Table3.pdf")
-
+  footnote(general = "*All models include rank as a covariate",
+           general_title = "") %>%
+  save_kable("Table3.pdf")
 ```
 
 
@@ -850,10 +685,11 @@ GC.LMM1.Ests<-plot_model(GC.LMM1, show.values=TRUE, title="", axis.labels=c("Ran
 Fig1.Obj1.1 <- ggarrange(GCProx.plot, GC.LMM1.Ests, labels= c("(a)", "(b)"), font.label = list(size = 11)) + 
   annotation_custom(grid.rect(.5,.5, width=unit(1,"npc"), height=unit(1,"npc"), gp=gpar(lwd=3, fill=NA, col="black"), draw=TRUE)) 
 
-Fig1.Obj1.1 <- annotate_figure(Fig1.Obj1.1, bottom = text_grob(expression(paste("* p< 0.05; ** p<0.01; ", "\u2020", " ln transformed")), hjust = 3.7, x = 1, face = "italic", size = 8)); Fig1.Obj1.1
+Fig1.Obj1.1 <- annotate_figure(Fig1.Obj1.1, bottom = text_grob(expression(paste("* p< 0.05; ** p<0.01; *** p<0.001 ", "\u2020", " log transformed")), hjust = 2.72, x = 1, face = "italic", size = 8)); Fig1.Obj1.1
 
-ggsave("~/Google Drive/Projects/Masters/BES MS/Figures/Fig1.pdf", Fig1.Obj1.1, width= 174, height= 100, units= "mm", device=cairo_pdf)
+ggsave("~/Google Drive/Projects/Masters/rhesus-sociality-fGC-uNEO/Fig1.pdf", Fig1.Obj1.1, width= 174, height= 100, units= "mm", device=cairo_pdf)
 ```
+
 ```{r echo=FALSE}
 Fig1.Obj1.1
 ```
@@ -945,9 +781,9 @@ NEO.Con.All.plots<-ggarrange(NEO.Con.Total.Gr.plots, NEO.Con.Gr.Rec.plots) +
 
 Fig2.Obj1.2<- ggarrange(NEO.TL.All.plots, NEO.Con.All.plots, nrow=2, ncol=1)
 
-Fig2.Obj1.2 <- annotate_figure(Fig2.Obj1.2, bottom = text_grob(expression(paste("* p< 0.05; ** p<0.01; ", "\u2020", " ln transformed")), hjust = 4.9, x = 1, face = "italic", size = 6)); Fig2.Obj1.2
+Fig2.Obj1.2 <- annotate_figure(Fig2.Obj1.2, bottom = text_grob(expression(paste("* p< 0.05; ** p<0.01; *** p<0.001 ", "\u2020", " log transformed")), hjust = 2.72, x = 1, face = "italic", size = 6)); Fig2.Obj1.2
 
-ggsave("~/Google Drive/Projects/Masters/BES MS/Figures/Fig2.pdf", Fig2.Obj1.2, width= 174, height= 120, units= "mm", device=cairo_pdf)
+ggsave("~/Google Drive/Projects/Masters/rhesus-sociality-fGC-uNEO/Fig2.pdf", Fig2.Obj1.2, width= 174, height= 120, units= "mm", device=cairo_pdf)
 ```
 
 ```{r echo=FALSE}
@@ -966,7 +802,7 @@ NEOCONFreqCop.plot <- ggplot(data=x, aes(x=FreqTimeSpentCop, y=fit)) +
                     ymax=fit+se), width=0.0001, colour="gray", alpha=0.2) +
   theme_light(base_size=10) +
   scale_x_continuous(limits=c(0.0,0.08)) +
-  labs(y=expression(paste("Concurrent uNEO (ng/mg CR)"^"\u2020")), x="Copulation Rate") +
+  labs(y=expression(paste("Concurrent uNEO (ng/mg CR)"^"\u2020")), x="Proportion of Time Spent Copulating") +
   theme(axis.title = element_text(size=11, color="black"),
         axis.title.y= element_text(size=14))
 
@@ -978,9 +814,9 @@ NEO.Con.LMM5.Ests<-plot_model(NEO.Con.LMM5, show.values=TRUE, title="", colors=c
 Fig3.Obj2 <- ggarrange(NEOCONFreqCop.plot, NEO.Con.LMM5.Ests, labels= c("(a)", "(b)"), font.label = list(size = 11)) +
   annotation_custom(grid.rect(.5,.5, width=unit(1,"npc"), height=unit(1,"npc"), gp=gpar(lwd=3, fill=NA, col="black"), draw=TRUE))
 
-Fig3.Obj2 <- annotate_figure(Fig3.Obj2, bottom = text_grob(expression(paste("* p< 0.05; ** p<0.01; ", "\u2020", " ln transformed")), hjust = 3.7, x = 1, face = "italic", size = 8)); Fig3.Obj2
+Fig3.Obj2 <- annotate_figure(Fig3.Obj2, bottom = text_grob(expression(paste("* p< 0.05; ** p<0.01; *** p<0.001 ", "\u2020", " log transformed")), hjust = 3.7, x = 1, face = "italic", size = 8)); Fig3.Obj2
 
-ggsave("~/Google Drive/Projects/Masters/BES MS/Figures/Fig3.pdf", Fig3.Obj2, width= 174, height= 100, units= "mm", device=cairo_pdf)
+ggsave("~/Google Drive/Projects/Masters/rhesus-sociality-fGC-uNEO/Fig3.pdf", Fig3.Obj2, width= 174, height= 100, units= "mm", device=cairo_pdf)
 
 ```
 
@@ -990,34 +826,34 @@ Fig3.Obj2
 
 ### Fig4. Objective 3
 
-```{r echo=FALSE, warning=FALSE, results='hide', message=FALSE, fig.show='hide'}
-GCbox <- ggplot(boxplot, aes(Time.in.Mating.Season, GC, fill= Time.in.Mating.Season)) +
-  geom_boxplot(alpha=1) +
-  labs(x="Mating Season Progression", 
-       y=expression(paste("fGC (ng/g dry weight)"))) +
-  theme_light() +
-  theme(legend.position="none",
-        axis.title.y=element_text(size=16),
-        axis.title.x = element_text(size=12)) +
-  scale_fill_manual(values=c("lightgray", "darkgray"))
-NEObox <- ggplot(boxplot, aes(Time.in.Mating.Season, NEO, fill= Time.in.Mating.Season)) +
-  geom_boxplot(alpha=1) +
-  labs(x="Mating Season Progression", 
-       y=expression(paste("uNEO (ng/mg CR)"))) +
-  theme_light()+ 
-  theme(legend.position="none",
-        axis.title.y=element_text(size=16),
-        axis.title.x = element_text(size=12))+
-  scale_fill_manual(values=c("lightgray", "darkgray"))+
-  annotate(geom="text", x=1.5, y=500, label="**", size=8)
+```{r}
+NEOmod <- lmer(log(NEO.CR) ~ Month  + RelRank + (1 |Focal.ID), data= NEO)
+ef <- effect("Month", NEOmod, xlevels=list(Month=NEO$Month))
+x <- as.data.frame(ef)
+NEOMonth.plot <- ggplot(data=x, aes(x=Month, y=fit)) + 
+  geom_line()  + 
+  geom_point(size=1) +
+  geom_errorbar(aes(ymin=fit-se,
+                    ymax=fit+se), width=0.0001, colour="gray", alpha=0.2) +
+  theme_light(base_size=10) +
+  scale_x_continuous(limits=c(1,4)) +
+  labs(y=expression(paste("uNEO (ng/mg CR)"^"\u2020")), x="Month") +
+  theme(axis.title = element_text(size=11, color="black"),
+        axis.title.y= element_text(size=14))
 
-Fig4.Obj3 <- ggarrange(GCbox, NEObox, labels= c("(a)", "(b)"), font.label = list(size = 11)) +
+
+NEOMonth.Ests<-plot_model(NEOmod, show.values=TRUE, title="", colors=c("black", "gray44"), axis.labels=c("Rank", "Month"), dot.size = 1, line.size = 0.5, group.terms=c(1,2)) +
+  set_theme(axis.title.size=1)
+
+
+Fig4.Obj3 <- ggarrange(NEOMonth.plot, NEOMonth.Ests, labels= c("(a)", "(b)"), font.label = list(size = 11)) +
   annotation_custom(grid.rect(.5,.5, width=unit(1,"npc"), height=unit(1,"npc"), gp=gpar(lwd=3, fill=NA, col="black"), draw=TRUE))
 
-Fig4.Obj3 <- annotate_figure(Fig4.Obj3, bottom = text_grob("* p< 0.05; ** p<0.01", hjust = 7, x = 1, size = 8)); Fig4.Obj3
+Fig4.Obj3 <- annotate_figure(Fig4.Obj3, bottom = text_grob(expression(paste("* p< 0.05; ** p<0.01; *** p<0.001 ", "\u2020", " log transformed")), hjust = 2.95, x = 1, face = "italic", size = 8)); Fig4.Obj3
 
-ggsave("~/Google Drive/Projects/Masters/BES MS/Figures/Fig4.pdf", Fig4.Obj3, width= 174, height= 100, units= "mm", device=cairo_pdf)
+ggsave("~/Google Drive/Projects/Masters/rhesus-sociality-fGC-uNEO/Fig4.pdf", Fig4.Obj3, width= 174, height= 100, units= "mm", device=cairo_pdf)
 ```
+
 
 ```{r echo=FALSE}
 Fig4.Obj3
