@@ -21,7 +21,7 @@ lapply(x, require, character.only = TRUE)
 
 ## SUMMARY STATS: Number of minutes followed per day
 ```{r}
-BehaviorOnly <- read.csv("~/Google Drive/Projects/Masters/R input sheets/RhesusFullBehavior.csv")
+BehaviorOnly <- read.csv("RhesusFullBehavior.csv")
 
 BehaviorOnly$TotalKnownDuration <- chron(times= BehaviorOnly$TotalKnownDuration, format= "h:m:s")
 
@@ -112,8 +112,8 @@ MeanCop$MaxCop <- paste(floor(MeanCop$MaxCop), round((MeanCop$MaxCop-floor(MeanC
 
 ## IOR
 ```{r}
-GroomingIOR <- read.csv("~/Google Drive/Projects/Masters/R input sheets/GroomingIOR.csv")
-ScanIOR <- read.csv("~/Google Drive/Projects/Masters/R input sheets/ScanIOR.csv")
+GroomingIOR <- read.csv("GroomingIOR.csv")
+ScanIOR <- read.csv("ScanIOR.csv")
 ```
 
 ```{r}
@@ -151,7 +151,7 @@ cor.test(ScanIOR$CR, ScanIOR$LR)
 
 ### GC LMMs (Models 1.1- 1.4)
 ```{r}
-GC_Behavior_raw=read.csv("~/Google Drive/Projects/Masters/R input sheets/GC_behavior_matched.csv", h=T) 
+GC_Behavior_raw=read.csv("GC_behavior_matched.csv", h=T) 
 
 GC_Behavior_raw$Behav_Date<- mdy(GC_Behavior_raw$Behav_Date)
 GC_Behavior_raw$Month <- factor(GC_Behavior_raw$Month)
@@ -161,6 +161,7 @@ GC_Behavior <- GC_Behavior_raw %>%
   mutate(DateDiffCentered = (DateDiff - 2))
 ```
 
+Model 1.1
 ```{r}
 GC.LMM1=lmer(log(GC.final.conc)~ FreqAllProx + RelRank  + DateDiffCentered + I(DateDiffCentered ^ 2) + (1|ID) + (1|Behav_Date), data=GC_Behavior)
 
@@ -194,6 +195,7 @@ GC.LMM1.red=lmer(log(GC.final.conc)~ RelRank + DateDiffCentered + I(DateDiffCent
 anova(GC.LMM1, GC.LMM1.red) #model including proximity not significantly better fit than reduced model
 ```
 
+Model 1.2
 ```{r}
 GC.LMM2=lmer(log(GC.final.conc)~ FreqTotalGR + RelRank + DateDiffCentered + I(DateDiffCentered ^ 2) + (1|ID) + (1|Behav_Date), data=GC_Behavior)
 
@@ -225,6 +227,7 @@ GC.LMM2.red=lmer(log(GC.final.conc)~ RelRank + DateDiffCentered + I(DateDiffCent
 anova(GC.LMM2, GC.LMM2.red) #model including total grooming not significantly better fit than reduced model.
 ```
 
+Model 1.3
 ```{r}
 GC.LMM3=lmer(log(GC.final.conc)~ FreqGRRec + RelRank + DateDiffCentered + I(DateDiffCentered ^ 2) + (1|ID) + (1|Behav_Date), data=GC_Behavior)
 
@@ -258,6 +261,7 @@ GC.LMM3.red=lmer(log(GC.final.conc)~ RelRank + DateDiffCentered + I(DateDiffCent
 anova(GC.LMM3, GC.LMM3.red)
 ```
 
+Model 1.4
 ```{r}
 GC.LMM4=lmer(log(GC.final.conc)~ FreqGRGiven + RelRank + DateDiffCentered + I(DateDiffCentered ^ 2) + (1|ID) + (1|Behav_Date), data=GC_Behavior)
 
@@ -304,7 +308,7 @@ TL_NEO <- TL_NEO %>%
   mutate(DateDiffCentered = (DateDiff - 15))
 ```
 
-
+Model 1.5
 ```{r}
 NEO.TL.LMM1=lmer(log(NEO.CR)~ FreqAllProx +  RelRank + DateDiffCentered + I(DateDiffCentered ^ 2) + (1|ID) + (1|Behav_Date), data=TL_NEO)
 
@@ -335,7 +339,7 @@ NEO.TL.LMM1.red=lmer(log(NEO.CR)~ RelRank + DateDiffCentered + I(DateDiffCentere
 anova(NEO.TL.LMM1, NEO.TL.LMM1.red) #model with proximity not sig better fit than model without
 ```
 
-
+Model 1.6
 ```{r}
 NEO.TL.LMM2=lmer(log(NEO.CR)~ FreqTotalGR + RelRank +  DateDiffCentered + I(DateDiffCentered ^ 2) + (1|ID) +(1|Behav_Date), data=TL_NEO)
 
@@ -367,7 +371,7 @@ NEO.TL.LMM2.red=lmer(log(NEO.CR)~ RelRank + DateDiffCentered + I(DateDiffCentere
 anova(NEO.TL.LMM2, NEO.TL.LMM2.red) #model including total grooming IS sig better fit than model without
 ```
 
-
+Model 1.7
 ```{r}
 NEO.TL.LMM3=lmer(log(NEO.CR)~ FreqGRRec + RelRank + DateDiffCentered + I(DateDiffCentered ^ 2) + (1|ID) +(1|Behav_Date), data=TL_NEO)
 
@@ -400,7 +404,7 @@ NEO.TL.LMM3.red=lmer(log(NEO.CR)~ RelRank + DateDiffCentered + I(DateDiffCentere
 anova(NEO.TL.LMM3, NEO.TL.LMM3.red) #model without receiving grooming not sig better fit than model without
 ```
 
-
+Model 1.8
 ```{r}
 NEO.TL.LMM4=lmer(log(NEO.CR)~ FreqGRGiven + RelRank + DateDiffCentered + I(DateDiffCentered ^ 2) + (1|ID) +(1|Behav_Date), data=TL_NEO)
 
@@ -440,7 +444,6 @@ TLNEOcorSoc <- p.adjust(c(AnovaNEO.TL.LMM1[2,3], AnovaNEO.TL.LMM2[2,3], AnovaNEO
 ```
 
 ### Concurrent NEO LMMs (Models 1.9- 1.12)
-
 ```{r}
 Concurrent_NEO<-read.csv("~/Google Drive/Projects/Masters/R input sheets/Concurrent_NEO.csv", h=T)
 
@@ -450,7 +453,7 @@ Concurrent_NEO <- Concurrent_NEO %>%
   mutate(DateDiffCentered = DateDiff)
 ```
 
-
+Model 1.9
 ```{r}
 NEO.Con.LMM1=lmer(log(NEO.CR)~ FreqAllProx  + RelRank + DateDiffCentered + I(DateDiffCentered ^ 2) + (1|ID) + (1|Behav_Date), data=Concurrent_NEO)
 
@@ -482,7 +485,7 @@ NEO.Con.LMM1.red=lmer(log(NEO.CR)~ RelRank + DateDiffCentered +I(DateDiffCentere
 anova(NEO.Con.LMM1, NEO.Con.LMM1.red) # Model with proximity not sig better fit than model without
 ```
 
-
+Model 1.10
 ```{r}
 NEO.Con.LMM2=lmer(log(NEO.CR)~ FreqTotalGR + RelRank +  DateDiffCentered + I(DateDiffCentered ^ 2) + (1|ID) +(1|Behav_Date), data=Concurrent_NEO)
 
@@ -513,7 +516,7 @@ NEO.Con.LMM2.red=lmer(log(NEO.CR)~ RelRank + DateDiffCentered + I(DateDiffCenter
 anova(NEO.Con.LMM2, NEO.Con.LMM2.red) #model with total grooming IS sig better fit than model without total grooming
 ```
 
-
+Model 1.11
 ```{r}
 NEO.Con.LMM3=lmer(log(NEO.CR)~ FreqGRRec + RelRank + DateDiffCentered +I(DateDiffCentered ^ 2) + (1|ID) +(1|Behav_Date), data=Concurrent_NEO)
 
@@ -544,7 +547,7 @@ NEO.Con.LMM3.red=lmer(log(NEO.CR)~  RelRank + DateDiffCentered +I(DateDiffCenter
 anova(NEO.Con.LMM3, NEO.Con.LMM3.red) #model with receiving grooming IS sig better fit than model without
 ```
 
-
+Model 1.12
 ```{r}
 NEO.Con.LMM4=lmer(log(NEO.CR)~ FreqGRGiven + RelRank + DateDiffCentered + I(DateDiffCentered ^ 2) + (1|ID) +(1|Behav_Date), data=Concurrent_NEO)
 
@@ -585,6 +588,7 @@ ConNEOcorSoc <- p.adjust(c(AnovaNEO.Con.LMM1[2,3], AnovaNEO.Con.LMM2[2,3], Anova
 
 ### GC LMMs (Models 2.1 & 2.2)
 
+Model 2.1
 ```{r}
 GC.LMM5=lmer(log(GC.final.conc)~ FreqTimeSpentCop + RelRank + DateDiffCentered +  I(DateDiffCentered ^ 2) + (1|ID) + (1|Behav_Date), data=GC_Behavior)
 
@@ -616,6 +620,7 @@ GC.LMM5.red=lmer(log(GC.final.conc)~ RelRank + DateDiffCentered + I(DateDiffCent
 anova(GC.LMM5, GC.LMM5.red) #model with copulation is not sig better fit than model without
 ```
 
+Model 2.2
 ```{r}
 GC.LMM6=lmer(log(GC.final.conc)~ FreqTimeSpentConsort + RelRank + DateDiffCentered + I(DateDiffCentered ^ 2) + (1|ID) + (1|Behav_Date), data=GC_Behavior)
 
@@ -653,6 +658,8 @@ GCcorSex <- p.adjust(c(AnovaGC.LMM5[2,3], AnovaGC.LMM6[2,3]), method = "fdr"); G
 
 
 ### Time-lagged NEO LMMs (Models 2.3 & 2.4)
+
+Model 2.3
 ```{r}
 NEO.TL.LMM5=lmer(log(NEO.CR)~ FreqTimeSpentCop + RelRank + DateDiffCentered + I(DateDiffCentered ^ 2) + (1|ID) + (1|Behav_Date), data=TL_NEO)
 
@@ -685,7 +692,7 @@ NEO.TL.LMM5.red=lmer(log(NEO.CR)~ RelRank + DateDiffCentered + I(DateDiffCentere
 anova(NEO.TL.LMM5, NEO.TL.LMM5.red) #model including copulation is not sig better fit than model without
 ```
 
-
+Model 2.4
 ```{r}
 NEO.TL.LMM6=lmer(log(NEO.CR)~ FreqTimeSpentConsort + RelRank + DateDiffCentered + I(DateDiffCentered ^ 2) + (1|ID) +(1|Behav_Date), data=TL_NEO)
 
@@ -725,6 +732,8 @@ TLNEOcorSex <- p.adjust(c(AnovaNEO.TL.LMM5[2,3], AnovaNEO.TL.LMM6[2,3]), method 
 
 
 ### Concurrent NEO LMMs (Models 2.5 & 2.6)
+
+Model 2.5
 ```{r}
 NEO.Con.LMM5=lmer(log(NEO.CR)~ FreqTimeSpentCop + RelRank + DateDiffCentered + I(DateDiffCentered ^ 2) + (1|ID) +(1|Behav_Date), data=Concurrent_NEO)
 
@@ -755,7 +764,7 @@ NEO.Con.LMM5.red=lmer(log(NEO.CR)~ RelRank + DateDiffCentered + I(DateDiffCenter
 anova(NEO.Con.LMM5, NEO.Con.LMM5.red) #model including copulation IS sig better fit than model without
 ```
 
-
+Model 2.6
 ```{r}
 NEO.Con.LMM6=lmer(log(NEO.CR)~ FreqTimeSpentConsort + RelRank + DateDiffCentered + I(DateDiffCentered ^ 2) + (1|ID) +(1|Behav_Date), data=Concurrent_NEO)
 
@@ -797,6 +806,7 @@ ConNEOcorSex <- p.adjust(c(AnovaNEO.Con.LMM5[2,3], AnovaNEO.Con.LMM6[2,3]), meth
 library(lmerTest)
 ```
 
+Posthoc model 1
 ```{r}
 NEO.Con.LMM.TotalGr.drop1model=lmer(log(NEO.CR)~ FreqTotalGrJuv + FreqTotalGrAM + FreqGRAF + RelRank + DateDiffCentered + I(DateDiffCentered ^ 2) +  (1|ID) + (1|Behav_Date), data=Concurrent_NEO)
 ```
@@ -845,11 +855,8 @@ NEO.Con.LMM.TotalGr.drop1test.tidy <- NEO.Con.LMM.TotalGr.drop1test %>%
 
 
 ### Concurrent NEO Receiving grooming drop1 analysis
-```{r echo=FALSE}
-library(lmerTest)
-```
 
-
+Posthoc model 2
 ```{r}
 NEO.Con.LMM.RecGr.drop1model=lmer(log(NEO.CR)~ FreqGrRecJuv + FreqGrRecAM + FreqGrRecAF + RelRank + DateDiffCentered + I(DateDiffCentered ^ 2) + (1|ID) + (1|Behav_Date), data=Concurrent_NEO)
 ```
@@ -900,13 +907,15 @@ NEO.Con.LMM.RecGr.drop1test.tidy <- NEO.Con.LMM.RecGr.drop1test %>%
 # OBJECTIVE 3
 
 ```{r}
-GCunmatched <- read.csv("~/Google Drive/Projects/Masters/rhesus-sociality-fGC-uNEO/GCunmatched.csv")
+GCunmatched <- read.csv("GCunmatched.csv")
 
-NEOunmatched <- read.csv("~/Google Drive/Projects/Masters/rhesus-sociality-fGC-uNEO/NEOunmatched.csv")
+NEOunmatched <- read.csv("NEOunmatched.csv")
 
 ```
 
-## LMM changes in fGC over time (Model 3.1)
+## LMM changes in fGC over time
+
+Model 3.1
 ```{r}
 #GC over time model
 GC.month.mod <- lmer(log(final.conc) ~ Month + RelRank + (1|Focal.ID), data=GC)
@@ -939,7 +948,9 @@ anova(GC.month.mod, GC.month.red, type="III") #model including month not sig bet
 ```
 
 
-## LMM changes in uNEO over time (Model 3.2)
+## LMM changes in uNEO over time
+
+Model 3.2
 ```{r}
 NEO.month.mod <- lmer(log(NEO.CR) ~ Month  + RelRank + (1 |Animal.ID), data= NEOunmatched)
 
@@ -1004,7 +1015,9 @@ AverageCR.DF
 #Apr mean= 0.513
 ```
 
-## Model change in uNEO over time, excluding data from January (Model 3.3)
+## Model change in uNEO over time, excluding data from January 
+
+Model 3.3
 ```{r}
 NEOnoJan <- NEOunmatched %>%
   filter(Month != "1")
@@ -1112,14 +1125,12 @@ Obj3.Summary.Kable <- Obj3.Summary %>%
 
 ### read in data:
 ```{r}
-GC_Behavior<-read.csv("~/Google Drive/Projects/Masters/R input sheets/GC_behavior_matched.csv", h=T)
-TL_NEO<-read.csv("~/Google Drive/Projects/Masters/R input sheets/Time-lagged_NEO.csv", h=T)
-
-Concurrent_NEO<-read.csv("~/Google Drive/Projects/Masters/R input sheets/Concurrent_NEO.csv", h=T)
+GC_Behavior<-read.csv("GC_behavior_matched.csv", h=T)
+TL_NEO<-read.csv("Time-lagged_NEO.csv", h=T)
+Concurrent_NEO<-read.csv("Concurrent_NEO.csv", h=T)
 
 Concurrent_NEO <- Concurrent_NEO %>%
   mutate(DateDiffCentered = DateDiff)
-
 ```
 
 # Fig. 1 Objective 1: Concurrent results
