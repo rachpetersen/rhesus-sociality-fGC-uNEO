@@ -14,7 +14,7 @@ div.yellow pre { background-color:lightyellow; }
 
 ## LOAD LIBRARIES
 ```{r message=FALSE, results='hide'}
-x<-c("car", "lme4", "effects", "ggplot2", "grid", "gridExtra", "dplyr", "tibble", "stringr", "condformat", 'kableExtra', 'crayon', 'fitdistrplus', 'sjPlot', "tidyverse", "ggpubr", "cowplot", "lubridate", "hms", "chron")
+x<-c("car", "lme4", "effects", "ggplot2", "grid", "gridExtra", "dplyr", "tibble", "stringr", "condformat", 'kableExtra', 'crayon', 'sjPlot', "tidyverse", "ggpubr", "cowplot", "lubridate", "hms", "chron")
 lapply(x, require, character.only = TRUE)
 ```
 
@@ -328,7 +328,7 @@ dev.off()
 #model summary
 summary(NEO.TL.LMM1)
 AnovaNEO.TL.LMM1 <- Anova(NEO.TL.LMM1, type= "III")
-tab_model(NEO.TL.LMM1, show.df= TRUE, show.stat=TRUE, show.se= TRUE, show.ci=FALSE, string.se = "SE",  string.stat = "t-value", p.val = "kr", pred.labels= c("(Intercept)", "Proximity", "Dominance rank", "Latency to sample collection (linear)", "Latency to sample collection (quadratic)"), dv.labels= "Response: uNEO (log transformed)", file="NEO.TL.LMM1.html")
+tab_model(NEO.TL.LMM1, show.df= TRUE, show.stat=TRUE, show.se= TRUE, show.ci=FALSE, string.se = "SE",  string.stat = "t-value", p.val = "kr", pred.labels= c("(Intercept)", "Proximity", "Dominance rank", "Latency to sample collection (linear)", "Latency to sample collection (quadratic)"), dv.labels= "Response: Time-lagged uNEO (log transformed)", file="NEO.TL.LMM1.html")
 
 # model comparison
 NEO.TL.LMM1.red=lmer(log(NEO.CR)~ RelRank + DateDiffCentered + I(DateDiffCentered ^ 2) + (1|ID) + (1|Behav_Date), data=TL_NEO)
@@ -360,7 +360,7 @@ dev.off()
 #model summary
 summary(NEO.TL.LMM2)
 AnovaNEO.TL.LMM2 <- Anova(NEO.TL.LMM2, type= "III")
-tab_model(NEO.TL.LMM2, show.df= TRUE, show.stat=TRUE, show.se= TRUE, show.ci=FALSE, string.se = "SE",  string.stat = "t-value", p.val = "kr", pred.labels= c("(Intercept)", "Total Grooming", "Dominance rank", "Latency to sample collection (linear)", "Latency to sample collection (quadratic)"), dv.labels= "Response: uNEO (log transformed)", file="NEO.TL.LMM2.html")
+tab_model(NEO.TL.LMM2, show.df= TRUE, show.stat=TRUE, show.se= TRUE, show.ci=FALSE, string.se = "SE",  string.stat = "t-value", p.val = "kr", pred.labels= c("(Intercept)", "Total Grooming", "Dominance rank", "Latency to sample collection (linear)", "Latency to sample collection (quadratic)"), dv.labels= "Response: Time-lagged uNEO (log transformed)", file="NEO.TL.LMM2.html")
 
 #model comparison
 NEO.TL.LMM2.red=lmer(log(NEO.CR)~ RelRank + DateDiffCentered + I(DateDiffCentered ^ 2) + (1|ID) +(1|Behav_Date), data=TL_NEO)
@@ -392,7 +392,7 @@ dev.off()
 #model summary
 summary(NEO.TL.LMM3)
 AnovaNEO.TL.LMM3 <- Anova(NEO.TL.LMM3, type= "III")
-tab_model(NEO.TL.LMM3, show.df= TRUE, show.stat=TRUE, show.se= TRUE, show.ci=FALSE, string.se = "SE",  string.stat = "t-value", p.val = "kr", pred.labels= c("(Intercept)", "Receiving Grooming", "Dominance rank", "Latency to sample collection (linear)", "Latency to sample collection (quadratic)"), dv.labels= "Response: uNEO (log transformed)", file="NEO.TL.LMM3.html")
+tab_model(NEO.TL.LMM3, show.df= TRUE, show.stat=TRUE, show.se= TRUE, show.ci=FALSE, string.se = "SE",  string.stat = "t-value", p.val = "kr", pred.labels= c("(Intercept)", "Receiving Grooming", "Dominance rank", "Latency to sample collection (linear)", "Latency to sample collection (quadratic)"), dv.labels= "Response: Time-lagged uNEO (log transformed)", file="NEO.TL.LMM3.html")
 
 
 #model comparison
@@ -426,7 +426,7 @@ dev.off()
 #model summary
 summary(NEO.TL.LMM4)
 AnovaNEO.TL.LMM4 <- Anova(NEO.TL.LMM4, type= "III")
-tab_model(NEO.TL.LMM4, show.df= TRUE, show.stat=TRUE, show.se= TRUE, show.ci=FALSE, string.se = "SE",  string.stat = "t-value", p.val = "kr", pred.labels= c("(Intercept)", "Giving Grooming", "Dominance rank", "Latency to sample collection (linear)", "Latency to sample collection (quadratic)"), dv.labels= "Response: uNEO (log transformed)", file="NEO.TL.LMM4.html")
+tab_model(NEO.TL.LMM4, show.df= TRUE, show.stat=TRUE, show.se= TRUE, show.ci=FALSE, string.se = "SE",  string.stat = "t-value", p.val = "kr", pred.labels= c("(Intercept)", "Giving Grooming", "Dominance rank", "Latency to sample collection (linear)", "Latency to sample collection (quadratic)"), dv.labels= "Response: Time-lagged uNEO (log transformed)", file="NEO.TL.LMM4.html")
 
 
 #model comparison
@@ -459,21 +459,27 @@ vif.NEO.Con.LMM1 <- vif(NEO.Con.LMM1)
 write.csv(vif.NEO.Con.LMM1, "vif.NEO.Con.LMM1.csv")
 
 pdf("NEO.Con.LMM1.frplot.pdf")
-plot(fitted(NEO.Con.LMM1), resid(NEO.Con.LMM1))
+plot(fitted(NEO.Con.LMM1), resid(NEO.Con.LMM1),
+    main = "Fitted vs. Residual plot",
+     xlab= "Residual values",
+     ylab= "Fitted values")
+text(x=4.7, y=1.3, labels="(A)", xpd = NA, cex=1.5, font=2)
 dev.off()
 
 pdf("NEO.Con.LMM1.qqplot.pdf")
 qqnorm(resid(NEO.Con.LMM1))
+text(x=-3.6, y=1.3, labels="(B)", xpd = NA, cex=1.5, font=2)
 dev.off()
 
 #model summary
 summary(NEO.Con.LMM1)
 AnovaNEO.Con.LMM1 <- Anova(NEO.Con.LMM1, type= "III")
-tab_model(NEO.Con.LMM1, dv.labels= "uNEO (log transformed)", file="NEO.Con.LMM1.html")
+tab_model(NEO.Con.LMM1, show.df= TRUE, show.stat=TRUE, show.se= TRUE, show.ci=FALSE, string.se = "SE",  string.stat = "t-value", p.val = "kr", pred.labels= c("(Intercept)", "Proximity", "Dominance rank", "Latency to sample collection (linear)", "Latency to sample collection (quadratic)"), dv.labels= "Response: Concurrent uNEO (log transformed)", file="NEO.Con.LMM1.html")
+
 
 #model comparison
 NEO.Con.LMM1.red=lmer(log(NEO.CR)~ RelRank + DateDiffCentered +I(DateDiffCentered ^ 2) + (1|ID) + (1|Behav_Date), data=Concurrent_NEO)
-anova(NEO.Con.LMM1, NEO.Con.LMM1.red)
+anova(NEO.Con.LMM1, NEO.Con.LMM1.red) # Model with proximity not sig better fit than model without
 ```
 
 
@@ -485,21 +491,26 @@ vif.NEO.Con.LMM2 <- vif(NEO.Con.LMM2)
 write.csv(vif.NEO.Con.LMM2, "vif.NEO.Con.LMM2.csv")
 
 pdf("NEO.Con.LMM2.frplot.pdf")
-plot(fitted(NEO.Con.LMM2), resid(NEO.Con.LMM2))
+plot(fitted(NEO.Con.LMM2), resid(NEO.Con.LMM2),
+    main = "Fitted vs. Residual plot",
+     xlab= "Residual values",
+     ylab= "Fitted values")
+text(x=4.7, y=1.2, labels="(A)", xpd = NA, cex=1.5, font=2)
 dev.off()
 
 pdf("NEO.Con.LMM2.qqplot.pdf")
 qqnorm(resid(NEO.Con.LMM2))
+text(x=-3.6, y=1.2, labels="(B)", xpd = NA, cex=1.5, font=2)
 dev.off()
 
 #model summary
 summary(NEO.Con.LMM2)
 AnovaNEO.Con.LMM2 <- Anova(NEO.Con.LMM2, type= "III")
-tab_model(NEO.Con.LMM2, dv.labels= "uNEO (log transformed)", file="NEO.Con.LMM2.html")
+tab_model(NEO.Con.LMM2, show.df= TRUE, show.stat=TRUE, show.se= TRUE, show.ci=FALSE, string.se = "SE",  string.stat = "t-value", p.val = "kr", pred.labels= c("(Intercept)", "Total Grooming", "Dominance rank", "Latency to sample collection (linear)", "Latency to sample collection (quadratic)"), dv.labels= "Response: Concurrent uNEO (log transformed)", file="NEO.Con.LMM2.html")
 
 #model comparison
 NEO.Con.LMM2.red=lmer(log(NEO.CR)~ RelRank + DateDiffCentered + I(DateDiffCentered ^ 2) + (1|ID) +(1|Behav_Date), data=Concurrent_NEO)
-anova(NEO.Con.LMM2, NEO.Con.LMM2.red)
+anova(NEO.Con.LMM2, NEO.Con.LMM2.red) #model with total grooming IS sig better fit than model without total grooming
 ```
 
 
@@ -511,21 +522,26 @@ vif.NEO.Con.LMM3 <- vif(NEO.Con.LMM3)
 write.csv(vif.NEO.Con.LMM3, "vif.NEO.Con.LMM3.csv")
 
 pdf("NEO.Con.LMM3.frplot.pdf")
-plot(fitted(NEO.Con.LMM3), resid(NEO.Con.LMM3))
+plot(fitted(NEO.Con.LMM3), resid(NEO.Con.LMM3),
+    main = "Fitted vs. Residual plot",
+     xlab= "Residual values",
+     ylab= "Fitted values")
+text(x=4.7, y=1.2, labels="(A)", xpd = NA, cex=1.5, font=2)
 dev.off()
 
 pdf("NEO.Con.LMM3.qqplot.pdf")
 qqnorm(resid(NEO.Con.LMM3))
+text(x=-3.6, y=1.2, labels="(B)", xpd = NA, cex=1.5, font=2)
 dev.off()
 
 #model summary
 summary(NEO.Con.LMM3)
 AnovaNEO.Con.LMM3 <- Anova(NEO.Con.LMM3, type= "III")
-tab_model(NEO.Con.LMM3, dv.labels= "uNEO (log transformed)", file="NEO.Con.LMM3.html")
+tab_model(NEO.Con.LMM3, show.df= TRUE, show.stat=TRUE, show.se= TRUE, show.ci=FALSE, string.se = "SE",  string.stat = "t-value", p.val = "kr", pred.labels= c("(Intercept)", "Receiving Grooming", "Dominance rank", "Latency to sample collection (linear)", "Latency to sample collection (quadratic)"), dv.labels= "Response: Concurrent uNEO (log transformed)", file="NEO.Con.LMM3.html")
 
 #model comparison
 NEO.Con.LMM3.red=lmer(log(NEO.CR)~  RelRank + DateDiffCentered +I(DateDiffCentered ^ 2) + (1|ID) +(1|Behav_Date), data=Concurrent_NEO)
-anova(NEO.Con.LMM3, NEO.Con.LMM3.red)
+anova(NEO.Con.LMM3, NEO.Con.LMM3.red) #model with receiving grooming IS sig better fit than model without
 ```
 
 
@@ -537,21 +553,26 @@ vif.NEO.Con.LMM4 <- vif(NEO.Con.LMM4)
 write.csv(vif.NEO.Con.LMM4, "vif.NEO.Con.LMM4.csv")
 
 pdf("NEO.Con.LMM4.frplot.pdf")
-plot(fitted(NEO.Con.LMM4), resid(NEO.Con.LMM4))
+plot(fitted(NEO.Con.LMM4), resid(NEO.Con.LMM4),
+    main = "Fitted vs. Residual plot",
+     xlab= "Residual values",
+     ylab= "Fitted values")
+text(x=4.7, y=1.2, labels="(A)", xpd = NA, cex=1.5, font=2)
 dev.off()
 
 pdf("NEO.Con.LMM4.qqplot.pdf")
 qqnorm(resid(NEO.Con.LMM4))
+text(x=-3.6, y=1.2, labels="(B)", xpd = NA, cex=1.5, font=2)
 dev.off()
 
 #model summary
 summary(NEO.Con.LMM4)
 AnovaNEO.Con.LMM4 <- Anova(NEO.Con.LMM4, type= "III")
-tab_model(NEO.Con.LMM4, dv.labels= "uNEO (log transformed)", file="NEO.Con.LMM4.html")
+tab_model(NEO.Con.LMM4, show.df= TRUE, show.stat=TRUE, show.se= TRUE, show.ci=FALSE, string.se = "SE",  string.stat = "t-value", p.val = "kr", pred.labels= c("(Intercept)", "Giving Grooming", "Dominance rank", "Latency to sample collection (linear)", "Latency to sample collection (quadratic)"), dv.labels= "Response: Concurrent uNEO (log transformed)", file="NEO.Con.LMM4.html")
 
 #model comparison
 NEO.Con.LMM4.red=lmer(log(NEO.CR)~ RelRank + DateDiffCentered + I(DateDiffCentered ^ 2) + (1|ID) +(1|Behav_Date), data=Concurrent_NEO)
-anova(NEO.Con.LMM4, NEO.Con.LMM4.red)
+anova(NEO.Con.LMM4, NEO.Con.LMM4.red) #model with giving grooming not sig better fit than model without
 ```
 
 p adjust for 4 Obj 1 models with concurrent uNEO as response variable
@@ -640,21 +661,28 @@ vif.NEO.TL.LMM5 <- vif(NEO.TL.LMM5)
 write.csv(vif.NEO.TL.LMM5, "vif.NEO.TL.LMM5.csv")
 
 pdf("NEO.TL.LMM5.frplot.pdf")
-plot(fitted(NEO.TL.LMM5), resid(NEO.TL.LMM5))
+plot(fitted(NEO.TL.LMM5), resid(NEO.TL.LMM5),
+    main = "Fitted vs. Residual plot",
+     xlab= "Residual values",
+     ylab= "Fitted values")
+text(x=4.7, y=1.3, labels="(A)", xpd = NA, cex=1.5, font=2)
 dev.off()
+
 
 pdf("NEO.TL.LMM5.qqplot.pdf")
 qqnorm(resid(NEO.TL.LMM5))
+text(x=-3.6, y=1.3, labels="(B)", xpd = NA, cex=1.5, font=2)
 dev.off()
+
 
 #model summary
 summary(NEO.TL.LMM5)
 AnovaNEO.TL.LMM5 <- Anova(NEO.TL.LMM5, type= "III")
-tab_model(NEO.TL.LMM5, dv.labels= "uNEO (log transformed)", file="NEO.TL.LMM5.html")
+tab_model(NEO.TL.LMM5, show.df= TRUE, show.stat=TRUE, show.se= TRUE, show.ci=FALSE, string.se = "SE",  string.stat = "t-value", p.val = "kr", pred.labels= c("(Intercept)", "Copulation", "Dominance rank", "Latency to sample collection (linear)", "Latency to sample collection (quadratic)"), dv.labels= "Response: Time-lagged uNEO (log transformed)", file="NEO.TL.LMM5.html")
 
 #model comparison
 NEO.TL.LMM5.red=lmer(log(NEO.CR)~ RelRank + DateDiffCentered + I(DateDiffCentered ^ 2) + (1|ID) + (1|Behav_Date), data=TL_NEO)
-anova(NEO.TL.LMM5, NEO.TL.LMM5.red)
+anova(NEO.TL.LMM5, NEO.TL.LMM5.red) #model including copulation is not sig better fit than model without
 ```
 
 
@@ -666,22 +694,28 @@ vif.NEO.TL.LMM6 <- vif(NEO.TL.LMM6)
 write.csv(vif.NEO.TL.LMM6, "vif.NEO.TL.LMM6.csv")
 
 pdf("NEO.TL.LMM6.frplot.pdf")
-plot(fitted(NEO.TL.LMM6), resid(NEO.TL.LMM6))
+plot(fitted(NEO.TL.LMM6), resid(NEO.TL.LMM6),
+    main = "Fitted vs. Residual plot",
+     xlab= "Residual values",
+     ylab= "Fitted values")
+text(x=4.7, y=1.3, labels="(A)", xpd = NA, cex=1.5, font=2)
 dev.off()
+
 
 pdf("NEO.TL.LMM6.qqplot.pdf")
 qqnorm(resid(NEO.TL.LMM6))
+text(x=-3.6, y=1.3, labels="(B)", xpd = NA, cex=1.5, font=2)
 dev.off()
 
 #model summary
 summary(NEO.TL.LMM6)
 AnovaNEO.TL.LMM6 <- Anova(NEO.TL.LMM6, type= "III")
-tab_model(NEO.TL.LMM6, dv.labels= "uNEO (log transformed)", file="NEO.TL.LMM6.html")
+sjPlot::tab_model(NEO.TL.LMM6, show.df= TRUE, show.stat=TRUE, show.se= TRUE, show.ci=FALSE, string.se = "SE",  string.stat = "t-value", p.val = "kr", pred.labels= c("(Intercept)", "Consortship", "Dominance rank", "Latency to sample collection (linear)", "Latency to sample collection (quadratic)"), dv.labels= "Response: Time-lagged uNEO (log transformed)", file="NEO.TL.LMM6.html")
 
 
 #model comparison
 NEO.TL.LMM6.red=lmer(log(NEO.CR)~ RelRank + DateDiffCentered + I(DateDiffCentered ^ 2) + (1|ID) +(1|Behav_Date), data=TL_NEO)
-anova(NEO.TL.LMM6, NEO.TL.LMM6.red)
+anova(NEO.TL.LMM6, NEO.TL.LMM6.red) #model including consortship not sig better fit than model without
 ```
 
 p adjust for 2 Obj 2 models with time-lagged NEO as response variable
@@ -699,21 +733,26 @@ vif.NEO.Con.LMM5 <- vif(NEO.Con.LMM5)
 write.csv(vif.NEO.Con.LMM5, "vif.NEO.Con.LMM5.csv")
 
 pdf("NEO.Con.LMM5.frplot.pdf")
-plot(fitted(NEO.Con.LMM5), resid(NEO.Con.LMM5))
+plot(fitted(NEO.Con.LMM5), resid(NEO.Con.LMM5),
+    main = "Fitted vs. Residual plot",
+     xlab= "Residual values",
+     ylab= "Fitted values")
+text(x=4.7, y=1.3, labels="(A)", xpd = NA, cex=1.5, font=2)
 dev.off()
 
 pdf("NEO.Con.LMM5.qqplot.pdf")
 qqnorm(resid(NEO.Con.LMM5))
+text(x=-3.6, y=1.3, labels="(B)", xpd = NA, cex=1.5, font=2)
 dev.off()
 
 #model summary
 summary(NEO.Con.LMM5)
 AnovaNEO.Con.LMM5 <- Anova(NEO.Con.LMM5, type= "III")
-tab_model(NEO.Con.LMM5, dv.labels= "uNEO (log transformed)", file="NEO.Con.LMM5.html")
+tab_model(NEO.Con.LMM5, show.df= TRUE, show.stat=TRUE, show.se= TRUE, show.ci=FALSE, string.se = "SE",  string.stat = "t-value", p.val = "kr", pred.labels= c("(Intercept)", "Copulation", "Dominance rank", "Latency to sample collection (linear)", "Latency to sample collection (quadratic)"), dv.labels= "Response: Concurrent uNEO (log transformed)", file="NEO.Con.LMM5.html")
 
 #model comparison
 NEO.Con.LMM5.red=lmer(log(NEO.CR)~ RelRank + DateDiffCentered + I(DateDiffCentered ^ 2) + (1|ID) +(1|Behav_Date), data=Concurrent_NEO)
-anova(NEO.Con.LMM5, NEO.Con.LMM5.red)
+anova(NEO.Con.LMM5, NEO.Con.LMM5.red) #model including copulation IS sig better fit than model without
 ```
 
 
@@ -725,21 +764,26 @@ vif.NEO.Con.LMM6 <- vif(NEO.Con.LMM6)
 write.csv(vif.NEO.Con.LMM6, "vif.NEO.Con.LMM6.csv")
 
 pdf("NEO.Con.LMM6.frplot.pdf")
-plot(fitted(NEO.Con.LMM6), resid(NEO.Con.LMM6))
+plot(fitted(NEO.Con.LMM6), resid(NEO.Con.LMM6),
+    main = "Fitted vs. Residual plot",
+     xlab= "Residual values",
+     ylab= "Fitted values")
+text(x=4.7, y=1.3, labels="(A)", xpd = NA, cex=1.5, font=2)
 dev.off()
 
 pdf("NEO.Con.LMM6.qqplot.pdf")
 qqnorm(resid(NEO.Con.LMM6))
+text(x=-3.6, y=1.3, labels="(B)", xpd = NA, cex=1.5, font=2)
 dev.off()
 
 #model summary
 summary(NEO.Con.LMM6)
 AnovaNEO.Con.LMM6 <- Anova(NEO.Con.LMM6, type= "III")
-tab_model(NEO.Con.LMM6, dv.labels= "uNEO (log transformed)", file="NEO.Con.LMM6.html")
+tab_model(NEO.Con.LMM6, show.df= TRUE, show.stat=TRUE, show.se= TRUE, show.ci=FALSE, string.se = "SE",  string.stat = "t-value", p.val = "kr", pred.labels= c("(Intercept)", "Consortship", "Dominance rank", "Latency to sample collection (linear)", "Latency to sample collection (quadratic)"), dv.labels= "Response: Concurrent uNEO (log transformed)", file="NEO.Con.LMM6.html")
 
 #model comparison
 NEO.Con.LMM6.red=lmer(log(NEO.CR)~ RelRank + DateDiffCentered + I(DateDiffCentered ^ 2) + (1|ID) +(1|Behav_Date), data=Concurrent_NEO)
-anova(NEO.Con.LMM6, NEO.Con.LMM6.red)
+anova(NEO.Con.LMM6, NEO.Con.LMM6.red) #model including consortship is not sig better fit than model without
 ```
 
 p adjust for 2 Obj 2 models with concurrent uNEO as response variable
@@ -748,26 +792,55 @@ ConNEOcorSex <- p.adjust(c(AnovaNEO.Con.LMM5[2,3], AnovaNEO.Con.LMM6[2,3]), meth
 ```
 
 
-### Concurrent NEO Total grooming drop1 analysis
+### Posthoc: Concurrent NEO Total grooming drop1 analysis
 ```{r echo= FALSE}
 library(lmerTest)
 ```
 
 ```{r}
-NEO.Con.LMM.TotalGr.drop1model=lmer(log(NEO.CR)~ FreqTotalGrJuv + FreqTotalGrAM + FreqGRAF + RelRank + DateDiffCentered + I(DateDiffCentered ^ 2) +  (1|ID) + (1|Behav_Date), data=Concurrent_NEO, REML=FALSE)
+NEO.Con.LMM.TotalGr.drop1model=lmer(log(NEO.CR)~ FreqTotalGrJuv + FreqTotalGrAM + FreqGRAF + RelRank + DateDiffCentered + I(DateDiffCentered ^ 2) +  (1|ID) + (1|Behav_Date), data=Concurrent_NEO)
+```
+
+```{r}
+#model diagnostics
+TotalGr.drop1 <- vif(NEO.Con.LMM.TotalGr.drop1model)
+write.csv(TotalGr.drop1, "vif.TotalGr.drop1.csv")
+
+pdf("TotalGr.drop1.frplot.pdf")
+plot(fitted(NEO.Con.LMM.TotalGr.drop1model), resid(NEO.Con.LMM.TotalGr.drop1model),
+    main = "Fitted vs. Residual plot",
+     xlab= "Residual values",
+     ylab= "Fitted values")
+text(x=4.7, y=1.3, labels="(A)", xpd = NA, cex=1.5, font=2)
+dev.off()
+
+pdf("TotalGr.drop1.qqplot.pdf")
+qqnorm(resid(NEO.Con.LMM.TotalGr.drop1model))
+text(x=-3.6, y=1.3, labels="(B)", xpd = NA, cex=1.5, font=2)
+dev.off()
 ```
 
 ```{r echo=FALSE}
 NEO.Con.LMM.TotalGr.drop1test <- as.data.frame(drop1(NEO.Con.LMM.TotalGr.drop1model, test= "Chi")); NEO.Con.LMM.TotalGr.drop1test
 
+
+dimnames(NEO.Con.LMM.TotalGr.drop1test)[[1]] <- list("Total Grooming with Juveniles", "Total Grooming with Adult Males", "Total Grooming with Adult Females", "Dominance rank", "Latency to sample collection (linear)", "Latency to sample collection (quadratic)")
+
+
 NEO.Con.LMM.TotalGr.drop1test.tidy <- NEO.Con.LMM.TotalGr.drop1test %>%
-  rownames_to_column(var= "Fixed Effect") %>%
-  rename("P_value" = "Pr(>F)") %>%
+  rownames_to_column(var= "Predictor") %>%
+  rename("p" = "Pr(>F)") %>%
+  rename("f-statistic" = "F value") %>%
+  rename("Sum of Squares" = "Sum Sq") %>%
+  rename("Mean Square" = "Mean Sq") %>%
+  rename("df (numerator)"= "NumDF") %>%
+  rename("df (denominator)"= "DenDF") %>%
   mutate_if(is.numeric, round, 3) %>%
-  mutate("P_value" = cell_spec(P_value, "html", color = ifelse(P_value > 0.05, "black", "red"))) %>%
+  mutate("p" = cell_spec(p, "html", bold = (p < 0.05))) %>%
   kable(format="html", escape = F) %>%
-  column_spec(7, background = "lightyellow") %>%
-  kable_styling(full_width=TRUE); NEO.Con.LMM.TotalGr.drop1test.tidy
+  row_spec(0, italic=T) %>%
+  kable_styling(full_width=TRUE) %>%
+  save_kable(file= "TotalGr.drop1.html"); NEO.Con.LMM.TotalGr.drop1test.tidy
 ```
 
 
@@ -778,20 +851,50 @@ library(lmerTest)
 
 
 ```{r}
-NEO.Con.LMM.RecGr.drop1model=lmer(log(NEO.CR)~ FreqGrRecJuv + FreqGrRecAM + FreqGrRecAF + RelRank + DateDiffCentered + I(DateDiffCentered ^ 2) + (1|ID) + (1|Behav_Date), data=Concurrent_NEO, REML=FALSE)
+NEO.Con.LMM.RecGr.drop1model=lmer(log(NEO.CR)~ FreqGrRecJuv + FreqGrRecAM + FreqGrRecAF + RelRank + DateDiffCentered + I(DateDiffCentered ^ 2) + (1|ID) + (1|Behav_Date), data=Concurrent_NEO)
 ```
 
-```{r echo=FALSE}
-NEO.Con.LMM.RecGr.drop1test <- as.data.frame(drop1(NEO.Con.LMM.RecGr.drop1model, test= "Chi"))
+```{r}
+#model diagnostics
+RecGr.drop1 <- vif(NEO.Con.LMM.RecGr.drop1model)
+write.csv(RecGr.drop1, "vif.RecGr.drop1.csv")
+
+pdf("RecGr.drop1.frplot.pdf")
+plot(fitted(NEO.Con.LMM.RecGr.drop1model), resid(NEO.Con.LMM.RecGr.drop1model),
+    main = "Fitted vs. Residual plot",
+     xlab= "Residual values",
+     ylab= "Fitted values")
+text(x=4.7, y=1, labels="(A)", xpd = NA, cex=1.5, font=2)
+dev.off()
+
+pdf("RecGr.drop1.qqplot.pdf")
+qqnorm(resid(NEO.Con.LMM.RecGr.drop1model))
+text(x=-3.6, y=1, labels="(B)", xpd = NA, cex=1.5, font=2)
+dev.off()
+```
+
+
+```{r}
+NEO.Con.LMM.RecGr.drop1test <- as.data.frame(drop1(NEO.Con.LMM.RecGr.drop1model, test= "Chi")); NEO.Con.LMM.RecGr.drop1test
+
+
+dimnames(NEO.Con.LMM.RecGr.drop1test)[[1]] <- list("Receiving Grooming from Juveniles", "Receiving Grooming from Adult Males", "Receiving Grooming from Adult Females", "Dominance rank", "Latency to sample collection (linear)", "Latency to sample collection (quadratic)")
+
 
 NEO.Con.LMM.RecGr.drop1test.tidy <- NEO.Con.LMM.RecGr.drop1test %>%
-  rownames_to_column(var= "Fixed Effect") %>%
-  rename("P_value" = "Pr(>F)") %>%
+  rownames_to_column(var= "Predictor") %>%
+  rename("p" = "Pr(>F)") %>%
+  rename("f-statistic" = "F value") %>%
+  rename("Sum of Squares" = "Sum Sq") %>%
+  rename("Mean Square" = "Mean Sq") %>%
+  rename("df (numerator)"= "NumDF") %>%
+  rename("df (denominator)"= "DenDF") %>%
   mutate_if(is.numeric, round, 3) %>%
-  mutate("P_value" = cell_spec(P_value, "html", color = ifelse(P_value > 0.05, "black", "red"))) %>%
+  mutate("p" = cell_spec(p, "html", bold = (p < 0.05))) %>%
   kable(format="html", escape = F) %>%
-  column_spec(7, background = "lightyellow") %>%
-  kable_styling(full_width=TRUE); NEO.Con.LMM.RecGr.drop1test.tidy
+  row_spec(0, italic=T) %>%
+  kable_styling(full_width=TRUE) %>%
+  save_kable(file= "RecGr.drop1.html"); NEO.Con.LMM.RecGr.drop1test.tidy
 ```
 
 # OBJECTIVE 3
@@ -813,17 +916,22 @@ vif.GC.month.mod <- vif(GC.month.mod)
 write.csv(vif.GC.month.mod, "vif.GC.month.csv")
 
 pdf("GC.month.frplot.pdf")
-plot(fitted(GC.month.mod), resid(GC.month.mod))
+plot(fitted(GC.month.mod), resid(GC.month.mod),
+    main = "Fitted vs. Residual plot",
+     xlab= "Residual values",
+     ylab= "Fitted values")
+text(x=6.02, y=1.3, labels="(A)", xpd = NA, cex=1.5, font=2)
 dev.off()
 
 pdf("GC.month.qqplot.pdf")
 qqnorm(resid(GC.month.mod))
+text(x=-3.5, y=1.3, labels="(B)", xpd = NA, cex=1.5, font=2)
 dev.off()
 
 #model summary
 summary(GC.month.mod)
-AnovaGC.Month <- Anova(GC.month.mod6, type= "III")
-tab_model(GC.month.mod, dv.labels= "fGC (log transformed)", file="GC.month.html")
+AnovaGC.Month <- Anova(GC.month.mod, type= "III")
+tab_model(GC.month.mod, show.df= TRUE, show.stat=TRUE, show.se= TRUE, show.ci=FALSE, string.se = "SE",  string.stat = "t-value", p.val = "kr", pred.labels= c("(Intercept)", "Month", "Dominance rank"), dv.labels= "Response: fGC (log transformed)", file="GC.month.mod.html")
 
 #comparison to reduced model
 GC.month.red <- lmer(log(final.conc) ~ Month + RelRank + (1|Focal.ID), data=GC)
@@ -840,17 +948,22 @@ vif.NEO.month.mod <- vif(NEO.month.mod)
 write.csv(vif.NEO.month.mod, "vif.NEO.month.csv")
 
 pdf("NEO.month.frplot.pdf")
-plot(fitted(NEO.month.mod), resid(NEO.month.mod))
+plot(fitted(NEO.month.mod), resid(NEO.month.mod),
+    main = "Fitted vs. Residual plot",
+     xlab= "Residual values",
+     ylab= "Fitted values")
+text(x=4.6, y=1.3, labels="(A)", xpd = NA, cex=1.5, font=2)
 dev.off()
 
 pdf("NEO.month.qqplot.pdf")
 qqnorm(resid(NEO.month.mod))
+text(x=-3.5, y=1.3, labels="(B)", xpd = NA, cex=1.5, font=2)
 dev.off()
 
 #model summary
 summary(NEO.month.mod)
 AnovaNEO.Month <- Anova(GC.month.mod6, type= "III")
-tab_model(NEO.month.mod, dv.labels= "uNEO (log transformed)", file="NEO.month.html")
+tab_model(NEO.month.mod, show.df= TRUE, show.stat=TRUE, show.se= TRUE, show.ci=FALSE, string.se = "SE",  string.stat = "t-value", p.val = "kr", pred.labels= c("(Intercept)", "Month", "Dominance rank"), dv.labels= "Response: uNEO (log transformed)", file="NEO.month.mod.html")
 
 #comparison to reduced model
 NEO.month.red <- lmer(log(NEO.CR) ~ RelRank + (1 |Animal.ID), data= NEOunmatched)
@@ -873,7 +986,7 @@ qqnorm(resid(Cr.month.mod))
 dev.off()
 
 #model summary
-summary(Cr.month.mod)
+summary(Cr.month.mod) #month sig predictor of creatinine
 Anova(Cr.month.mod)
 tab_model(Cr.month.mod, dv.labels= "Creatinine (log transformed)", file="CR.mod.html")
 ```
@@ -903,21 +1016,26 @@ vif.NEOnoJanmod <- vif(NEOnoJanmod)
 write.csv(vif.NEOnoJanmod, "vif.NEOnoJan.csv")
 
 pdf("NEOnoJan.frplot.pdf")
-plot(fitted(NEOnoJanmod) ~ resid(NEOnoJanmod))
+plot(fitted(NEOnoJanmod), resid(NEOnoJanmod),
+    main = "Fitted vs. Residual plot",
+     xlab= "Residual values",
+     ylab= "Fitted values")
+text(x=4.65, y=1.3, labels="(A)", xpd = NA, cex=1.5, font=2)
 dev.off()
 
 pdf("NEOnoJan.qqplot.pdf")
 qqnorm(resid(NEOnoJanmod))
+text(x=-3.5, y=1.3, labels="(B)", xpd = NA, cex=1.5, font=2)
 dev.off()
 
 #model summary
 summary(NEOnoJanmod)
 AnovaNEO.MonthNOJAN <- Anova(NEOnoJanmod, type= "III")
-tab_model(NEOnoJanmod, dv.labels= "Creatinine (log transformed)", file="NEOnoJan.html")
+tab_model(NEOnoJanmod, show.df= TRUE, show.stat=TRUE, show.se= TRUE, show.ci=FALSE, string.se = "SE",  string.stat = "t-value", p.val = "kr", pred.labels= c("(Intercept)", "Month", "Dominance rank"), dv.labels= "Response: uNEO excluding January (log transformed)", file="NEOnoJanmod.html")
 
 #comparison to reduced model
 NEOnoJanmod.red <- lmer(log(NEO.CR) ~ RelRank + (1 |Animal.ID), data= NEOnoJan)
-anova(NEOnoJanmod, NEOnoJanmod.red, type= "III") #model including month sig better fit
+anova(NEOnoJanmod, NEOnoJanmod.red, type= "III") #model including month IS sig better fit than model without
 ```
 
 Adjust p-values for multiple hypothesis testing
@@ -1014,14 +1132,15 @@ ef <- effect("FreqTotalGR", NEO.Con.LMM2, xlevels=list(FreqTotalGR=Concurrent_NE
 x <- as.data.frame(ef)
 NEOCONtotalGr.plot <- ggplot(x, aes(FreqTotalGR, fit)) + 
   geom_line()  + 
-  geom_point(size=0.8) +
+  geom_point(size=0.3) +
   geom_errorbar(aes(ymin=fit-se,
-                    ymax=fit+se), width=0.001, color="gray", alpha=0.2) +
+                    ymax=fit+se), color="grey37", alpha=0.2) +
   scale_y_continuous(n.breaks=4) +
   labs(y=expression(paste("Concurrent uNEO (ng/mg CR)"^"\u2020")), 
        x="Total Grooming Rate") +
   theme(axis.title = element_text(size=6.5, color="black"),
-        axis.title.y = element_text(size = 8))
+        axis.title.y = element_text(size = 8)) +
+  geom_point(data= Concurrent_NEO, aes(x= FreqTotalGR, y= log(NEO.CR)), size=0.2)
 
 NEO.Con.LMM2.Ests<-plot_model(NEO.Con.LMM2, show.values=TRUE, value.size=3, dot.size = 0.8, line.size = 0.4, colors=c("gray44", "black"), title="", rm.terms= c("DateDiffCentered", "I(DateDiffCentered^2)"), p.adjust= "fdr", vline.color= "black", axis.labels=c("Rank", "Total\n Grooming")) 
 
@@ -1035,13 +1154,14 @@ x <- as.data.frame(ef)
 
 NEOCONGrRec.plot <- ggplot(data=x, aes(x=FreqGRRec, y=fit)) + 
   geom_line()  + 
-  geom_point(size=0.8) +
+  geom_point(size=0.3) +
   geom_errorbar(aes(ymin=fit-se,
-                    ymax=fit+se), width=0.001, colour="gray", alpha=0.2) +
-  scale_y_continuous(n.breaks=4, labels=c(5.2,5.4, 5.6, "")) +
+                    ymax=fit+se), colour="grey37", alpha=0.2) +
+  scale_y_continuous(n.breaks=4) +
   labs(y=expression(paste("Concurrent uNEO (ng/mg CR)"^"\u2020")), x="Receiving Grooming Rate") +
   theme(axis.title = element_text(size=6.5, color="black"),
-        axis.title.y = element_text(size = 8))
+        axis.title.y = element_text(size = 8)) +
+  geom_point(data= Concurrent_NEO, aes(x= FreqGRRec, y= log(NEO.CR)), size=0.2)
 
 NEO.Con.LMM3.Ests<-plot_model(NEO.Con.LMM3, show.values=TRUE, value.size=3, dot.size = 0.8, line.size = 0.5, colors=c("gray44", "black"), p.adjust= "fdr", vline.color= "black", rm.terms= c("DateDiffCentered", "I(DateDiffCentered^2)"), title="", axis.labels=c("Rank", "Receiving\n Grooming")) 
 
@@ -1067,13 +1187,14 @@ ef <- effect("FreqTimeSpentCop", NEO.Con.LMM5, xlevels=list(FreqTimeSpentCop=Con
 x <- as.data.frame(ef)
 NEOCONFreqCop.plot <- ggplot(data=x, aes(x=FreqTimeSpentCop, y=fit)) + 
   geom_line()  + 
-  geom_point(size=1) +
+  geom_point(size=0.3) +
   geom_errorbar(aes(ymin=fit-se,
-                    ymax=fit+se), width=0.0001, colour="gray", alpha=0.2) +
+                    ymax=fit+se), colour="grey37", alpha=0.2) +
   scale_x_continuous(limits=c(0.0,0.08)) +
   labs(y=expression(paste("Concurrent uNEO (ng/mg CR)"^"\u2020")), x="Proportion of Time Spent Copulating") +
   theme(axis.title = element_text(size=6.5, color="black"),
-        axis.title.y= element_text(size=8))
+        axis.title.y= element_text(size=8)) +
+    geom_point(data= Concurrent_NEO, aes(x= FreqTimeSpentCop, y= log(NEO.CR)), size=0.2)
 
 
 NEO.Con.LMM5.Ests<-plot_model(NEO.Con.LMM5, show.values=TRUE, title="", colors=c("black", "gray44"), rm.terms= c("DateDiffCentered", "I(DateDiffCentered^2)"), axis.labels=c("Rank", "Copulation"), dot.size = 1, vline.color= "black", p.adjust= "fdr", line.size = 0.5, group.terms=c(1,2))
@@ -1100,13 +1221,14 @@ ef <- effect("Month", NEOmod, xlevels=list(Month=NEO$Month))
 x <- as.data.frame(ef)
 NEOMonth.plot <- ggplot(data=x, aes(x=Month, y=fit)) + 
   geom_line()  + 
-  geom_point(size=1) +
+  geom_point(size=0.3) +
   geom_errorbar(aes(ymin=fit-se,
-                    ymax=fit+se), width=0.0001, colour="gray", alpha=0.2) +
+                    ymax=fit+se), width= 0.0001, colour="grey37", alpha=0.2) +
   scale_x_continuous(limits=c(1,4)) +
   labs(y=expression(paste("uNEO (ng/mg CR)"^"\u2020")), x="Month") +
   theme(axis.title = element_text(size=6.5, color="black"),
-        axis.title.y= element_text(size=8))
+        axis.title.y= element_text(size=8)) +
+   geom_point(data= NEO, aes(x= Month, y= log(NEO.CR)), size=0.2)
 
 
 NEOMonth.Ests<-plot_model(NEOmod, show.values=TRUE, title="", colors=c("black", "gray44"), axis.labels=c("Rank", "Month"), dot.size = 1, vline.color= "black", p.adjust="fdr", line.size = 0.5, group.terms=c(1,2)) 
@@ -1115,7 +1237,7 @@ NEOMonth.Ests<-plot_model(NEOmod, show.values=TRUE, title="", colors=c("black", 
 Fig3.Obj3 <- ggarrange(NEOMonth.plot, NEOMonth.Ests, labels= c("(a)", "(b)"), font.label = list(size = 11)) +
   annotation_custom(grid.rect(.5,.5, width=unit(1,"npc"), height=unit(1,"npc"), gp=gpar(lwd=3, fill=NA, col="black"), draw=TRUE))
 
-Fig3.Obj3 <- annotate_figure(Fig3.Obj3, bottom = text_grob(expression(paste("* p< 0.05; ** p<0.01; *** p<0.001 ", "\u2020", " log transformed")), hjust = 2.7, x = 1, face = "italic", size = 8)); Fig4.Obj3
+Fig3.Obj3 <- annotate_figure(Fig3.Obj3, bottom = text_grob(expression(paste("* p< 0.05; ** p<0.01; *** p<0.001 ", "\u2020", " log transformed")), hjust = 2.7, x = 1, face = "italic", size = 8))
 
 ggsave("~/Google Drive/Projects/Masters/rhesus-sociality-fGC-uNEO/Fig3.pdf", Fig3.Obj3, width= 174, height= 100, units= "mm", device=cairo_pdf)
 ```
