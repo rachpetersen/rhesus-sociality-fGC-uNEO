@@ -294,7 +294,7 @@ anova(GC.LMM4, GC.LMM4.red) #model with giving grooming not sig better fit than 
 
 p adjust for 4 Obj 1 models with fGC as response variable
 ```{r}
-GCcorSoc <- p.adjust(c(AnovaGC.LMM1[2,3], AnovaGC.LMM2[2,3], AnovaGC.LMM3[2,3], AnovaGC.LMM4[2,3]), method = "fdr"); GCcorSoc
+GCcorSoc <- p.adjust(c(AnovaGC.LMM1[2,3], AnovaGC.LMM2[2,3], AnovaGC.LMM3[2,3], AnovaGC.LMM4[2,3]), method = "hommel"); GCcorSoc
 ```
 
 
@@ -440,7 +440,7 @@ anova(NEO.TL.LMM4, NEO.TL.LMM4.red) #model without giving grooming is not sig be
 
 p adjust for 4 Obj 1 models with time-lagged NEO as response variable
 ```{r}
-TLNEOcorSoc <- p.adjust(c(AnovaNEO.TL.LMM1[2,3], AnovaNEO.TL.LMM2[2,3], AnovaNEO.TL.LMM3[2,3], AnovaNEO.TL.LMM4[2,3]), method = "fdr"); TLNEOcorSoc
+TLNEOcorSoc <- p.adjust(c(AnovaNEO.TL.LMM1[2,3], AnovaNEO.TL.LMM2[2,3], AnovaNEO.TL.LMM3[2,3], AnovaNEO.TL.LMM4[2,3]), method = "hommel"); TLNEOcorSoc
 ```
 
 ### Concurrent NEO LMMs (Models 1.9- 1.12)
@@ -580,7 +580,7 @@ anova(NEO.Con.LMM4, NEO.Con.LMM4.red) #model with giving grooming not sig better
 
 p adjust for 4 Obj 1 models with concurrent uNEO as response variable
 ```{r}
-ConNEOcorSoc <- p.adjust(c(AnovaNEO.Con.LMM1[2,3], AnovaNEO.Con.LMM2[2,3], AnovaNEO.Con.LMM3[2,3], AnovaNEO.Con.LMM4[2,3]), method = "fdr"); ConNEOcorSoc
+ConNEOcorSoc <- p.adjust(c(AnovaNEO.Con.LMM1[2,3], AnovaNEO.Con.LMM2[2,3], AnovaNEO.Con.LMM3[2,3], AnovaNEO.Con.LMM4[2,3]), method = "hommel"); ConNEOcorSoc
 ```
 
 
@@ -653,7 +653,7 @@ anova(GC.LMM6, GC.LMM6.red) #model with consortship not sig better fit than mode
 
 p adjust for 2 Obj 2 models with fGC as response variable
 ```{r}
-GCcorSex <- p.adjust(c(AnovaGC.LMM5[2,3], AnovaGC.LMM6[2,3]), method = "fdr"); GCcorSex
+GCcorSex <- p.adjust(c(AnovaGC.LMM5[2,3], AnovaGC.LMM6[2,3]), method = "hommel"); GCcorSex
 ```
 
 
@@ -727,9 +727,8 @@ anova(NEO.TL.LMM6, NEO.TL.LMM6.red) #model including consortship not sig better 
 
 p adjust for 2 Obj 2 models with time-lagged NEO as response variable
 ```{r}
-TLNEOcorSex <- p.adjust(c(AnovaNEO.TL.LMM5[2,3], AnovaNEO.TL.LMM6[2,3]), method = "fdr"); TLNEOcorSex
+TLNEOcorSex <- p.adjust(c(AnovaNEO.TL.LMM5[2,3], AnovaNEO.TL.LMM6[2,3]), method = "hommel"); TLNEOcorSex
 ```
-
 
 ### Concurrent NEO LMMs (Models 2.5 & 2.6)
 
@@ -797,7 +796,7 @@ anova(NEO.Con.LMM6, NEO.Con.LMM6.red) #model including consortship is not sig be
 
 p adjust for 2 Obj 2 models with concurrent uNEO as response variable
 ```{r}
-ConNEOcorSex <- p.adjust(c(AnovaNEO.Con.LMM5[2,3], AnovaNEO.Con.LMM6[2,3]), method = "fdr"); ConNEOcorSex
+ConNEOcorSex <- p.adjust(c(AnovaNEO.Con.LMM5[2,3], AnovaNEO.Con.LMM6[2,3]), method = "hommel"); ConNEOcorSex
 ```
 
 
