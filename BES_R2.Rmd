@@ -12,37 +12,14 @@ knitr::opts_chunk$set(warning=FALSE, message=FALSE)
 div.yellow pre { background-color:lightyellow; }
 </style>
 
-## SECTION 1: LOAD LIBRARIES
+## LOAD LIBRARIES
 ```{r message=FALSE, results='hide'}
 x<-c("car", "lme4", "effects", "ggplot2", "grid", "gridExtra", "dplyr", "tibble", "stringr", "condformat", 'kableExtra', 'crayon', 'fitdistrplus', 'sjPlot', "tidyverse", "ggpubr", "cowplot", "lubridate", "hms", "chron")
 lapply(x, require, character.only = TRUE)
 ```
 
-## SECTION2: CREATININE OVER TIME
-```{r}
-NEO<- read.csv("~/Google Drive/Projects/Masters/rhesus-sociality-fGC-uNEO/NEOunmatched.csv")
 
-NEO$Date<- mdy(NEO$Date)
-
-mod1 <- lmer(log(CR.DF) ~ Month + (1|Animal.ID), data= NEO)
-
-plot(fitted(mod1) ~ resid(mod1))
-qqnorm(resid(mod1))
-
-summary(mod1)
-Anova(mod1)
-```
-
-```{r}
-AverageCR.DF <- NEO %>%
-  group_by(Month) %>%
-  summarise(mean = mean(CR.DF))
-
-AverageCR.DF
-```
-
-
-## SECTION 3: Number of minutes followed per day
+## SUMMARY STATS: Number of minutes followed per day
 ```{r}
 BehaviorOnly <- read.csv("~/Google Drive/Projects/Masters/R input sheets/RhesusFullBehavior.csv")
 
@@ -55,44 +32,8 @@ MeanDurations <- BehaviorOnly %>%
 MeanDurations$sd_duration <- chron(times= MeanDurations$sd_duration, format= "h:m:s")
 ```
 
-## SECTION 4: IOR
-```{r}
-GroomingIOR <- read.csv("~/Google Drive/Projects/Masters/R input sheets/GroomingIOR.csv")
-ScanIOR <- read.csv("~/Google Drive/Projects/Masters/R input sheets/ScanIOR.csv")
-```
-
-```{r}
-GroomingIOR$LR <- chron(times= GroomingIOR$LR, format= "h:m:s")
-GroomingIOR$CR <- chron(times= GroomingIOR$CR, format= "h:m:s")
-```
-
-```{r}
-TotalGrIOR <- GroomingIOR %>%
-  filter(Measure == "TotalGr")
-
-cor.test(TotalGrIOR$CR, TotalGrIOR$LR)
-```
-
-```{r}
-RecGrIOR <- GroomingIOR %>%
-  filter(Measure == "RecGr")
-
-cor.test(RecGrIOR$CR, RecGrIOR$LR)
-```
-
-```{r}
-GiveGrIOR <- GroomingIOR %>%
-  filter(Measure == "GiveGr")
-
-cor.test(GiveGrIOR$CR, GiveGrIOR$LR)
-```
-
-```{r}
-cor.test(ScanIOR$CR, ScanIOR$LR)
-```
-
-
-##SECTION X: TABLE WITH DURATIONS OF BEHAVIOR PER FOCAL
+##SUMMARY STATS: Mean durations of behavior per focal
+Social behaviors
 ```{r}
 FullBehavior <- read.csv("RhesusFullBehavior.csv")
 
@@ -132,14 +73,14 @@ MeanGivenGR$MaxGivenGR <- paste(floor(MeanGivenGR$MaxGivenGR), round((MeanGivenG
 
 MeanGivenGR <- format.data.frame(MeanGivenGR, digits= 2)
   
-View(MeanProx)
-View(MeanTotalGR)
-View(MeanRecGR)
-View(MeanGivenGR)
+#View(MeanProx)
+#View(MeanTotalGR)
+#View(MeanRecGR)
+#View(MeanGivenGR)
 
 ```
 
-
+Sexual behaviors
 ```{r}
 Concurrent_NEO <- read.csv("Concurrent_NEO.csv")
 View(Concurrent_NEO)
@@ -156,7 +97,7 @@ MeanCon$MeanCon <- paste(floor(MeanCon$MeanCon), round((MeanCon$MeanCon-floor(Me
 
 MeanCon$MaxCon <- paste(floor(MeanCon$MaxCon), round((MeanCon$MaxCon-floor(MeanCon$MaxCon))*60), sep=":")
 
-View(MeanCon)
+#View(MeanCon)
 
 MeanCop <- SexperFocal %>%
   group_by(ID) %>%
@@ -169,9 +110,44 @@ MeanCop$MaxCop <- paste(floor(MeanCop$MaxCop), round((MeanCop$MaxCop-floor(MeanC
 View(MeanCop)
 ```
 
+## IOR
+```{r}
+GroomingIOR <- read.csv("~/Google Drive/Projects/Masters/R input sheets/GroomingIOR.csv")
+ScanIOR <- read.csv("~/Google Drive/Projects/Masters/R input sheets/ScanIOR.csv")
+```
+
+```{r}
+GroomingIOR$LR <- chron(times= GroomingIOR$LR, format= "h:m:s")
+GroomingIOR$CR <- chron(times= GroomingIOR$CR, format= "h:m:s")
+```
+
+```{r}
+TotalGrIOR <- GroomingIOR %>%
+  filter(Measure == "TotalGr")
+
+cor.test(TotalGrIOR$CR, TotalGrIOR$LR)
+```
+
+```{r}
+RecGrIOR <- GroomingIOR %>%
+  filter(Measure == "RecGr")
+
+cor.test(RecGrIOR$CR, RecGrIOR$LR)
+```
+
+```{r}
+GiveGrIOR <- GroomingIOR %>%
+  filter(Measure == "GiveGr")
+
+cor.test(GiveGrIOR$CR, GiveGrIOR$LR)
+```
+
+```{r}
+cor.test(ScanIOR$CR, ScanIOR$LR)
+```
 
 
-## SECTION 5: LMM ANALYSES
+## LMM ANALYSES
 ### GC LMMs
 ```{r}
 GC_Behavior_raw=read.csv("~/Google Drive/Projects/Masters/R input sheets/GC_behavior_matched.csv", h=T) 
@@ -555,8 +531,8 @@ anova(NEO.Con.LMM5, NEO.Con.LMM5.red)
 
 
 ```{r}
-NEO.Con.LMM6=lmer(log(NEO.CR)~ FreqTimeSpentConsort + RelRank + I(DateDiffCentered ^ 2) + (1|ID) +(1|Behav_Date), data=Concurrent_NEO)
-NEO.Con.LMM6.red=lmer(log(NEO.CR)~ RelRank + I(DateDiffCentered ^ 2) + (1|ID) +(1|Behav_Date), data=Concurrent_NEO)
+NEO.Con.LMM6=lmer(log(NEO.CR)~ FreqTimeSpentConsort + RelRank + DateDiffCentered + I(DateDiffCentered ^ 2) + (1|ID) +(1|Behav_Date), data=Concurrent_NEO)
+NEO.Con.LMM6.red=lmer(log(NEO.CR)~ RelRank + DateDiffCentered + I(DateDiffCentered ^ 2) + (1|ID) +(1|Behav_Date), data=Concurrent_NEO)
 
 vif(NEO.Con.LMM6)
 plot(fitted(NEO.Con.LMM6), resid(NEO.Con.LMM6))
@@ -620,7 +596,7 @@ library(lmerTest)
 
 
 ```{r}
-NEO.Con.LMM.RecGr.drop1model=lmer(log(NEO.CR)~ FreqGrRecJuv + FreqGrRecAM + FreqGrRecAF + RelRank + DateDiffCentered + (1|ID) + (1|Behav_Date), data=Concurrent_NEO, REML=FALSE)
+NEO.Con.LMM.RecGr.drop1model=lmer(log(NEO.CR)~ FreqGrRecJuv + FreqGrRecAM + FreqGrRecAF + RelRank + DateDiffCentered + I(DateDiffCentered ^ 2) + (1|ID) + (1|Behav_Date), data=Concurrent_NEO, REML=FALSE)
 ```
 
 ```{r echo=FALSE}
@@ -644,34 +620,98 @@ NEOunmatched <- read.csv("~/Google Drive/Projects/Masters/rhesus-sociality-fGC-u
 
 ```
 
+Does creatinine change over time?
 ```{r}
-NEOnoJan <- NEO %>%
-  filter(Month != "1")
+NEOunmatched$Date<- mdy(NEOunmatched$Date)
 
-GCmod <- lmer(log(final.conc) ~ Month + RelRank + (1|Focal.ID), data=GC)
-summary(GCmod)
-AnovaGC.Month <- Anova(GCmod, type= "III")
+mod1 <- lmer(log(CR.DF) ~ Month + (1|Animal.ID), data= NEOunmatched)
 
-NEOmod <- lmer(log(NEO.CR) ~ Month  + RelRank + (1 |Focal.ID), data= NEO)
-summary(NEOmod)
-AnovaNEO.Month <- Anova(NEOmod, type= "III")
+#model diagnostics
+plot(fitted(mod1) ~ resid(mod1))
+qqnorm(resid(mod1))
+qqline(resid(mod1))
 
-NEOmod.red <- lmer(log(NEO.CR) ~ RelRank + (1 |Focal.ID), data= NEO)
-summary(NEOmod.red)
-anova(NEOmod, NEOmod.red, type= "III")
-
-NEOnoJanmod <- lmer(log(NEO.CR) ~ Month + RelRank + (1 |Focal.ID), data= NEOnoJan)
-summary(NEOnoJanmod)
-AnovaNEO.MonthNOJAN <- Anova(NEOnoJanmod, type= "III"); AnovaNEO.MonthNOJAN
+#model summary
+summary(mod1)
+Anova(mod1)
 ```
 
+How does mean uNEO change over time?
+```{r}
+AverageCR.DF <- NEOunmatched %>%
+  group_by(Month) %>%
+  summarise(mean = mean(CR.DF))
+
+AverageCR.DF
+#Jan mean= 1.06
+#Feb mean= 0.552
+#Mar mean= 0.596
+#Apr mean= 0.513
+```
+
+LMM changes in fGC over time
+```{r}
+#GC over time model
+GCmod <- lmer(log(final.conc) ~ Month + RelRank + (1|Focal.ID), data=GC)
+
+#model diagnostics
+vif(GCmod)
+plot(fitted(GCmod), resid(GCmod))
+qqnorm(resid(GCmod))
+
+#model summary
+summary(GCmod)
+AnovaGC.Month <- Anova(GCmod, type= "III")
+```
+
+LMM changes in uNEO over time
+```{r}
+NEOmod <- lmer(log(NEO.CR) ~ Month  + RelRank + (1 |Animal.ID), data= NEOunmatched)
+
+#model diagnostics
+vif(NEOmod)
+plot(fitted(NEOmod), resid(NEOmod))
+qqnorm(resid(NEOmod))
+
+#model summary
+summary(NEOmod) #month significant predictor of uNEO
+AnovaNEO.Month <- Anova(NEOmod, type= "III")
+
+#comparison to reduced model
+NEOmod.red <- lmer(log(NEO.CR) ~ RelRank + (1 |Animal.ID), data= NEOunmatched)
+anova(NEOmod, NEOmod.red, type= "III") #model including month sig better fit 
+```
+
+
+Model change in uNEO over time, excluding data from January
+```{r}
+NEOnoJan <- NEOunmatched %>%
+  filter(Month != "1")
+
+NEOnoJanmod <- lmer(log(NEO.CR) ~ Month + RelRank + (1 |Animal.ID), data= NEOnoJan)
+
+#model diagnostics
+vif(NEOnoJanmod)
+plot(fitted(NEOnoJanmod), resid(NEOnoJanmod))
+qqnorm(resid(NEOnoJanmod))
+
+#model summary
+summary(NEOnoJanmod)
+AnovaNEO.MonthNOJAN <- Anova(NEOnoJanmod, type= "III")
+
+#comparison to reduced model
+NEOnoJanmod.red <- lmer(log(NEO.CR) ~ RelRank + (1 |Animal.ID), data= NEOnoJan)
+anova(NEOnoJanmod, NEOnoJanmod.red, type= "III") #model including month sig better fit
+```
+
+## INCLUDE GC AND NEO IN THIS?????
 ```{r}
 MonthModsCor <- p.adjust(c(AnovaGC.Month[2,3], AnovaNEO.Month[2,3], AnovaNEO.MonthNOJAN[2,3]), method= "fdr")
 ```
 
 
 
-## SECTION 7: TABLES
+## TABLES
 
 ### Obj1 table
 ```{r echo=FALSE}
@@ -738,7 +778,11 @@ Obj3.Summary.Kable <- Obj3.Summary %>%
 ```{r}
 GC_Behavior<-read.csv("~/Google Drive/Projects/Masters/R input sheets/GC_behavior_matched.csv", h=T)
 TL_NEO<-read.csv("~/Google Drive/Projects/Masters/R input sheets/Time-lagged_NEO.csv", h=T)
+
 Concurrent_NEO<-read.csv("~/Google Drive/Projects/Masters/R input sheets/Concurrent_NEO.csv", h=T)
+
+Concurrent_NEO <- Concurrent_NEO %>%
+  mutate(DateDiffCentered = DateDiff)
 
 ```
 
@@ -822,9 +866,9 @@ NEO.TL.All.plots <- ggarrange(NEO.TL.Total.Gr.plots, NEO.TL.Gr.Rec.plots) +
 # Fig. 1 Concurrent results
 ```{r echo=FALSE, warning=FALSE, results='hide', message=FALSE, fig.show='hide'}
 
-set_theme(base= theme_light())
+set_theme(base= theme_classic(base_size= 6.5))
 
-NEO.Con.LMM2=lmer(log(NEO.CR)~ FreqTotalGR + RelRank + (1|ID) +(1|Month), data=Concurrent_NEO)
+NEO.Con.LMM2=lmer(log(NEO.CR)~ FreqTotalGR + RelRank + DateDiffCentered + I(DateDiffCentered ^ 2) + (1|ID) +(1|Behav_Date), data=Concurrent_NEO)
 ef <- effect("FreqTotalGR", NEO.Con.LMM2, xlevels=list(FreqTotalGR=Concurrent_NEO$FreqTotalGR))
 x <- as.data.frame(ef)
 NEOCONtotalGr.plot <- ggplot(x, aes(FreqTotalGR, fit)) + 
@@ -832,23 +876,19 @@ NEOCONtotalGr.plot <- ggplot(x, aes(FreqTotalGR, fit)) +
   geom_point(size=0.8) +
   geom_errorbar(aes(ymin=fit-se,
                     ymax=fit+se), width=0.001, color="gray", alpha=0.2) +
-  theme_light(base_size=6) +
   scale_y_continuous(n.breaks=4) +
   labs(y=expression(paste("Concurrent uNEO (ng/mg CR)"^"\u2020")), 
        x="Total Grooming Rate") +
-  theme(axis.title = element_text(size=6, color="black"),
+  theme(axis.title = element_text(size=6.5, color="black"),
         axis.title.y = element_text(size = 8))
 
-NEO.Con.LMM2.Ests<-plot_model(NEO.Con.LMM2, show.values=TRUE, value.size=3, dot.size = 0.8, line.size = 0.4, colors=c("gray44", "black"), title="", rm.terms= c("DateDiffCentered", "I(DateDiffCentered^2)"), vline.color= "black", axis.labels=c("Rank", "Total\n Grooming")) 
+NEO.Con.LMM2.Ests<-plot_model(NEO.Con.LMM2, show.values=TRUE, value.size=3, dot.size = 0.8, line.size = 0.4, colors=c("gray44", "black"), title="", rm.terms= c("DateDiffCentered", "I(DateDiffCentered^2)"), p.adjust= "fdr", vline.color= "black", axis.labels=c("Rank", "Total\n Grooming")) 
 
-NEO.Con.LMM2.Ests <- NEO.Con.LMM2.Ests + theme_sjplot(base_size= 6)
-NEO.Con.LMM2.Ests <- NEO.Con.LMM2.Ests + font(base_size= 6)
-; NEO.Con.LMM2.Ests
 
 NEO.Con.Total.Gr.plots <- ggarrange(NEOCONtotalGr.plot, NEO.Con.LMM2.Ests, labels= c("(a)", "(b)"), font.label = list(size = 8)) + 
-    annotation_custom(grid.rect(.5,.5, width=unit(1,"npc"), height=unit(1,"npc"), gp=gpar(lwd=3, fill=NA, col="black"), draw=TRUE))
+    annotation_custom(grid.rect(.5,.5, width=unit(1,"npc"), height=unit(1,"npc"), gp=gpar(lwd=1, fill=NA, col="black"), draw=TRUE))
 
-NEO.Con.LMM3=lmer(log(NEO.CR)~ FreqGRRec + RelRank + (1|ID) +(1|Month), data=Concurrent_NEO)
+NEO.Con.LMM3=lmer(log(NEO.CR)~ FreqGRRec + RelRank + DateDiffCentered + I(DateDiffCentered ^ 2) + (1|ID) +(1|Behav_Date), data=Concurrent_NEO)
 ef <- effect("FreqGRRec", NEO.Con.LMM3, xlevels=list(FreqGRRec=Concurrent_NEO$FreqGRRec))
 x <- as.data.frame(ef)
 
@@ -857,25 +897,22 @@ NEOCONGrRec.plot <- ggplot(data=x, aes(x=FreqGRRec, y=fit)) +
   geom_point(size=0.8) +
   geom_errorbar(aes(ymin=fit-se,
                     ymax=fit+se), width=0.001, colour="gray", alpha=0.2) +
-  theme_light(base_size=6) +
   scale_y_continuous(n.breaks=4, labels=c(5.2,5.4, 5.6, "")) +
   labs(y=expression(paste("Concurrent uNEO (ng/mg CR)"^"\u2020")), x="Receiving Grooming Rate") +
-  theme(axis.title = element_text(size=6, color="black"),
+  theme(axis.title = element_text(size=6.5, color="black"),
         axis.title.y = element_text(size = 8))
 
-NEO.Con.LMM3.Ests<-plot_model(NEO.Con.LMM3, show.values=TRUE, value.size=3, dot.size = 0.8, line.size = 0.5, colors=c("gray44", "black"), vline.color= "black", title="", axis.labels=c("Rank", "Receiving\n Grooming")) 
+NEO.Con.LMM3.Ests<-plot_model(NEO.Con.LMM3, show.values=TRUE, value.size=3, dot.size = 0.8, line.size = 0.5, colors=c("gray44", "black"), p.adjust= "fdr", vline.color= "black", rm.terms= c("DateDiffCentered", "I(DateDiffCentered^2)"), title="", axis.labels=c("Rank", "Receiving\n Grooming")) 
 
-NEO.Con.LMM3.Ests <- NEO.Con.LMM3.Ests + theme_sjplot(base_size= 6); NEO.Con.LMM3.Ests
 
 NEO.Con.Gr.Rec.plots <- ggarrange(NEOCONGrRec.plot, NEO.Con.LMM3.Ests, labels= c("(c)", "(d)"), font.label = list(size = 8)) + 
-    annotation_custom(grid.rect(.5,.5, width=unit(1,"npc"), height=unit(1,"npc"), gp=gpar(lwd=3, fill=NA, col="black"), draw=TRUE))
-
+    annotation_custom(grid.rect(.5,.5, width=unit(1,"npc"), height=unit(1,"npc"), gp=gpar(lwd=1, fill=NA, col="black"), draw=TRUE)) 
 
 Fig2.Obj1.2<- ggarrange(NEO.Con.Total.Gr.plots, NEO.Con.Gr.Rec.plots, nrow=2, ncol=1)
 
 Fig2.Obj1.2 <- annotate_figure(Fig2.Obj1.2, bottom = text_grob(expression(paste("* p< 0.05; ** p<0.01; *** p<0.001 ", "\u2020", " log transformed")), hjust = 3.65, x = 1, face = "italic", size = 6)); Fig2.Obj1.2
 
-ggsave("~/Google Drive/Projects/Masters/rhesus-sociality-fGC-uNEO/Fig2.pdf", Fig2.Obj1.2, width= 174, height= 120, units= "mm", device=cairo_pdf)
+ggsave("~/Google Drive/Projects/Masters/rhesus-sociality-fGC-uNEO/Fig1.pdf", Fig2.Obj1.2, width= 174, height= 120, units= "mm", device=cairo_pdf)
 ```
 
 ```{r echo=FALSE}
@@ -884,7 +921,7 @@ Fig2.Obj1.2
 
 ### Fig3. Objective 2 
 ```{r echo=FALSE, warning=FALSE, message=FALSE, results='hide', fig.show='hide'}
-NEO.Con.LMM5=lmer(log(NEO.CR)~ FreqTimeSpentCop + RelRank + (1|ID) +(1|Month), data=Concurrent_NEO)
+NEO.Con.LMM5=lmer(log(NEO.CR)~ FreqTimeSpentCop + RelRank + DateDiffCentered + I(DateDiffCentered^2) + (1|ID) +(1|Behav_Date), data=Concurrent_NEO)
 ef <- effect("FreqTimeSpentCop", NEO.Con.LMM5, xlevels=list(FreqTimeSpentCop=Concurrent_NEO$FreqTimeSpentCop))
 x <- as.data.frame(ef)
 NEOCONFreqCop.plot <- ggplot(data=x, aes(x=FreqTimeSpentCop, y=fit)) + 
@@ -892,23 +929,21 @@ NEOCONFreqCop.plot <- ggplot(data=x, aes(x=FreqTimeSpentCop, y=fit)) +
   geom_point(size=1) +
   geom_errorbar(aes(ymin=fit-se,
                     ymax=fit+se), width=0.0001, colour="gray", alpha=0.2) +
-  theme_light(base_size=10) +
   scale_x_continuous(limits=c(0.0,0.08)) +
   labs(y=expression(paste("Concurrent uNEO (ng/mg CR)"^"\u2020")), x="Proportion of Time Spent Copulating") +
-  theme(axis.title = element_text(size=11, color="black"),
-        axis.title.y= element_text(size=14))
+  theme(axis.title = element_text(size=6.5, color="black"),
+        axis.title.y= element_text(size=8))
 
 
-NEO.Con.LMM5.Ests<-plot_model(NEO.Con.LMM5, show.values=TRUE, title="", colors=c("black", "gray44"), axis.labels=c("Rank", "Copulation"), dot.size = 1, line.size = 0.5, group.terms=c(1,2)) +
-  set_theme(axis.title.size=1)
+NEO.Con.LMM5.Ests<-plot_model(NEO.Con.LMM5, show.values=TRUE, title="", colors=c("black", "gray44"), rm.terms= c("DateDiffCentered", "I(DateDiffCentered^2)"), axis.labels=c("Rank", "Copulation"), dot.size = 1, vline.color= "black", p.adjust= "fdr", line.size = 0.5, group.terms=c(1,2))
 
 
 Fig3.Obj2 <- ggarrange(NEOCONFreqCop.plot, NEO.Con.LMM5.Ests, labels= c("(a)", "(b)"), font.label = list(size = 11)) +
-  annotation_custom(grid.rect(.5,.5, width=unit(1,"npc"), height=unit(1,"npc"), gp=gpar(lwd=3, fill=NA, col="black"), draw=TRUE))
+  annotation_custom(grid.rect(.5,.5, width=unit(1,"npc"), height=unit(1,"npc"), gp=gpar(lwd=1, fill=NA, col="black"), draw=TRUE))
 
 Fig3.Obj2 <- annotate_figure(Fig3.Obj2, bottom = text_grob(expression(paste("* p< 0.05; ** p<0.01; *** p<0.001 ", "\u2020", " log transformed")), hjust = 2.72, x = 1, face = "italic", size = 8)); Fig3.Obj2
 
-ggsave("~/Google Drive/Projects/Masters/rhesus-sociality-fGC-uNEO/Fig3.pdf", Fig3.Obj2, width= 174, height= 100, units= "mm", device=cairo_pdf)
+ggsave("~/Google Drive/Projects/Masters/rhesus-sociality-fGC-uNEO/Fig2.pdf", Fig3.Obj2, width= 174, height= 100, units= "mm", device=cairo_pdf)
 
 ```
 
@@ -927,15 +962,13 @@ NEOMonth.plot <- ggplot(data=x, aes(x=Month, y=fit)) +
   geom_point(size=1) +
   geom_errorbar(aes(ymin=fit-se,
                     ymax=fit+se), width=0.0001, colour="gray", alpha=0.2) +
-  theme_light(base_size=10) +
   scale_x_continuous(limits=c(1,4)) +
   labs(y=expression(paste("uNEO (ng/mg CR)"^"\u2020")), x="Month") +
-  theme(axis.title = element_text(size=11, color="black"),
-        axis.title.y= element_text(size=14))
+  theme(axis.title = element_text(size=6.5, color="black"),
+        axis.title.y= element_text(size=8))
 
 
-NEOMonth.Ests<-plot_model(NEOmod, show.values=TRUE, title="", colors=c("black", "gray44"), axis.labels=c("Rank", "Month"), dot.size = 1, line.size = 0.5, group.terms=c(1,2)) +
-  set_theme(axis.title.size=1)
+NEOMonth.Ests<-plot_model(NEOmod, show.values=TRUE, title="", colors=c("black", "gray44"), axis.labels=c("Rank", "Month"), dot.size = 1, vline.color= "black", p.adjust="fdr", line.size = 0.5, group.terms=c(1,2)) 
 
 
 Fig4.Obj3 <- ggarrange(NEOMonth.plot, NEOMonth.Ests, labels= c("(a)", "(b)"), font.label = list(size = 11)) +
@@ -943,7 +976,7 @@ Fig4.Obj3 <- ggarrange(NEOMonth.plot, NEOMonth.Ests, labels= c("(a)", "(b)"), fo
 
 Fig4.Obj3 <- annotate_figure(Fig4.Obj3, bottom = text_grob(expression(paste("* p< 0.05; ** p<0.01; *** p<0.001 ", "\u2020", " log transformed")), hjust = 2.7, x = 1, face = "italic", size = 8)); Fig4.Obj3
 
-ggsave("~/Google Drive/Projects/Masters/rhesus-sociality-fGC-uNEO/Fig4.pdf", Fig4.Obj3, width= 174, height= 100, units= "mm", device=cairo_pdf)
+ggsave("~/Google Drive/Projects/Masters/rhesus-sociality-fGC-uNEO/Fig3.pdf", Fig4.Obj3, width= 174, height= 100, units= "mm", device=cairo_pdf)
 ```
 
 
