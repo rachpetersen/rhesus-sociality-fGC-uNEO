@@ -18,10 +18,9 @@ x<-c("car", "lme4", "effects", "ggplot2", "grid", "gridExtra", "dplyr", "tibble"
 lapply(x, require, character.only = TRUE)
 ```
 
-## SECTION2: CREATININE
+## SECTION2: CREATININE OVER TIME
 ```{r}
 NEO<- read.csv("~/Google Drive/Projects/Masters/rhesus-sociality-fGC-uNEO/NEOunmatched.csv")
-Hierarchy <- read.csv("~/Google Drive/Projects/Masters/rhesus-sociality-fGC-uNEO/Rhierarchy52.csv")
 
 NEO$Date<- mdy(NEO$Date)
 
@@ -38,13 +37,14 @@ Anova(mod1)
 AverageCR.DF <- NEO %>%
   group_by(Month) %>%
   summarise(mean = mean(CR.DF))
+
+AverageCR.DF
 ```
 
 
 ## SECTION 3: Number of minutes followed per day
 ```{r}
 BehaviorOnly <- read.csv("~/Google Drive/Projects/Masters/R input sheets/RhesusFullBehavior.csv")
-#View(BehaviorOnly)
 
 BehaviorOnly$TotalKnownDuration <- chron(times= BehaviorOnly$TotalKnownDuration, format= "h:m:s")
 
@@ -517,37 +517,8 @@ detach("package:lmerTest", unload=TRUE)
 ```
 
 
-## SECTION 4: EARLY VS LATE IN MATING SEASON PAIRED T-TESTS
-### Load the data:
-```{r}
-pairedGC<-read.csv("~/Google Drive/Projects/Masters/R input sheets/GC_paired_t_test.csv", h=T)
-pairedNEO<-read.csv("~/Google Drive/Projects/Masters/R input sheets/NEO_paired_t_test.csv", h=T)
-```
 
-### Paired t-test Early vs. Late GC
-```{r}
-GCPairedt.test <- t.test(pairedGC$Early, pairedGC$Late, paired=TRUE); GCPairedt.test
-```
-
-### Paired t-test Early vs. Late NEO
-```{r}
-NEOPairedt.test <- t.test(pairedNEO$Early, pairedNEO$Late, paired=TRUE); NEOPairedt.test
-```
-
-```{r echo=FALSE}
-t.test.results<- data.frame(Marker= c("GC", "NEO"), t_value= c(GCPairedt.test$statistic, NEOPairedt.test$statistic), Mean_difference= c(GCPairedt.test$estimate, NEOPairedt.test$estimate), CI_low = c(GCPairedt.test$conf.int[2], NEOPairedt.test$conf.int[2]), CI_high= c(GCPairedt.test$conf.int[1], NEOPairedt.test$conf.int[1]), P_value= c(GCPairedt.test$p.value, NEOPairedt.test$p.value)); t.test.results
-
-t.test.results.tidy <- t.test.results %>%
-  mutate_if(is.numeric, round, 3) %>%
-  mutate("P_value" = cell_spec(P_value, "html", color = ifelse(P_value > 0.05, "black", "red"))) %>%
-  kable(format="html", escape = F) %>%
-  column_spec(6, background = "lightyellow") %>%
-  kable_styling(full_width=TRUE); t.test.results.tidy
-
-```
-
-
-## SECTION 4.5: Mixed model for mating season progression
+## SECTION 6: Mixed model for mating season progression
 ```{r}
 GCunmatched <- read.csv("~/Google Drive/Projects/Masters/rhesus-sociality-fGC-uNEO/GCunmatched.csv")
 
@@ -587,11 +558,11 @@ anova(NEOmod, NEOmod.red, type= "III")
 
 NEOnoJanmod <- lmer(log(NEO.CR) ~ Month + RelRank + (1 |Focal.ID), data= NEOnoJan)
 summary(NEOnoJanmod)
-AnovaNEO.MonthNOJAN <- Anova(NEOnoJanmod, type= "III")
+AnovaNEO.MonthNOJAN <- Anova(NEOnoJanmod, type= "III"); AnovaNEO.MonthNOJAN
 ```
 
 
-## SECTION 5: TABLES
+## SECTION 7: TABLES
 
 ### Obj1 table
 ```{r echo=FALSE}
@@ -634,7 +605,7 @@ Obj2.Summary.Kable <- Obj2.Summary %>%
 
 ### Obj 3 table
 ```{r echo=FALSE}
-Obj3.Summary <-data.frame(Response_variable = c("fGC (n=195)", "uNEO (n=324)", "uNEO w/o Jan (n=300)"), Fixed_Effect = c("Month", "Month", "Month"), "Estimate" = c(summary(GCmod)$coef[2,"Estimate"], summary(NEOmod)$coef[2,"Estimate"],  summary(NEOnoJanmod)$coef[2,"Estimate"]), Std_Error= c(summary(GCmod)$coef[2, "Std. Error"], summary(NEOmod)$coef[2, "Std. Error"], summary(NEOnoJanmod)$coef[2,"Std. Error"]), t_value= c(summary(GCmod)$coef[2, "t value"], summary(NEOmod)$coef[2, "t value"], summary(NEOnoJanmod)$coef[2,"t value"]), Walds_Chi_square= c(AnovaGC.Month[2,1], AnovaNEO.Month[2,1], AnovaNEO.MonthNOJAN[2,1]), P_value = c(round(AnovaGC.Month[2,3], digits= 3), "<0.001", "<0.001"))
+Obj3.Summary <-data.frame(Response_variable = c("fGC (n=195)", "uNEO (n=324)", "uNEO without January data (n=300)"), Fixed_Effect = c("Month", "Month", "Month"), "Estimate" = c(summary(GCmod)$coef[2,"Estimate"], summary(NEOmod)$coef[2,"Estimate"],  summary(NEOnoJanmod)$coef[2,"Estimate"]), Std_Error= c(summary(GCmod)$coef[2, "Std. Error"], summary(NEOmod)$coef[2, "Std. Error"], summary(NEOnoJanmod)$coef[2,"Std. Error"]), t_value= c(summary(GCmod)$coef[2, "t value"], summary(NEOmod)$coef[2, "t value"], summary(NEOnoJanmod)$coef[2,"t value"]), Walds_Chi_square= c(AnovaGC.Month[2,1], AnovaNEO.Month[2,1], AnovaNEO.MonthNOJAN[2,1]), P_value = c(round(AnovaGC.Month[2,3], digits= 3), "<0.001", "<0.001"))
 ```
 
 
@@ -652,14 +623,14 @@ Obj3.Summary.Kable <- Obj3.Summary %>%
 ```
 
 
-## SECTION 6: FIGURES
+## SECTION 8: FIGURES
 
 ### read in data:
 ```{r}
 GC_Behavior<-read.csv("~/Google Drive/Projects/Masters/R input sheets/GC_behavior_matched.csv", h=T)
 TL_NEO<-read.csv("~/Google Drive/Projects/Masters/R input sheets/Time-lagged_NEO.csv", h=T)
 Concurrent_NEO<-read.csv("~/Google Drive/Projects/Masters/R input sheets/Concurrent_NEO.csv", h=T)
-boxplot<-read.csv("~/Google Drive/Projects/Masters/R input sheets/GC_NEO_boxplot.csv",h=T)
+
 ```
 
 
@@ -781,7 +752,7 @@ NEO.Con.All.plots<-ggarrange(NEO.Con.Total.Gr.plots, NEO.Con.Gr.Rec.plots) +
 
 Fig2.Obj1.2<- ggarrange(NEO.TL.All.plots, NEO.Con.All.plots, nrow=2, ncol=1)
 
-Fig2.Obj1.2 <- annotate_figure(Fig2.Obj1.2, bottom = text_grob(expression(paste("* p< 0.05; ** p<0.01; *** p<0.001 ", "\u2020", " log transformed")), hjust = 2.72, x = 1, face = "italic", size = 6)); Fig2.Obj1.2
+Fig2.Obj1.2 <- annotate_figure(Fig2.Obj1.2, bottom = text_grob(expression(paste("* p< 0.05; ** p<0.01; *** p<0.001 ", "\u2020", " log transformed")), hjust = 3.65, x = 1, face = "italic", size = 6)); Fig2.Obj1.2
 
 ggsave("~/Google Drive/Projects/Masters/rhesus-sociality-fGC-uNEO/Fig2.pdf", Fig2.Obj1.2, width= 174, height= 120, units= "mm", device=cairo_pdf)
 ```
@@ -814,7 +785,7 @@ NEO.Con.LMM5.Ests<-plot_model(NEO.Con.LMM5, show.values=TRUE, title="", colors=c
 Fig3.Obj2 <- ggarrange(NEOCONFreqCop.plot, NEO.Con.LMM5.Ests, labels= c("(a)", "(b)"), font.label = list(size = 11)) +
   annotation_custom(grid.rect(.5,.5, width=unit(1,"npc"), height=unit(1,"npc"), gp=gpar(lwd=3, fill=NA, col="black"), draw=TRUE))
 
-Fig3.Obj2 <- annotate_figure(Fig3.Obj2, bottom = text_grob(expression(paste("* p< 0.05; ** p<0.01; *** p<0.001 ", "\u2020", " log transformed")), hjust = 3.7, x = 1, face = "italic", size = 8)); Fig3.Obj2
+Fig3.Obj2 <- annotate_figure(Fig3.Obj2, bottom = text_grob(expression(paste("* p< 0.05; ** p<0.01; *** p<0.001 ", "\u2020", " log transformed")), hjust = 2.72, x = 1, face = "italic", size = 8)); Fig3.Obj2
 
 ggsave("~/Google Drive/Projects/Masters/rhesus-sociality-fGC-uNEO/Fig3.pdf", Fig3.Obj2, width= 174, height= 100, units= "mm", device=cairo_pdf)
 
@@ -849,7 +820,7 @@ NEOMonth.Ests<-plot_model(NEOmod, show.values=TRUE, title="", colors=c("black", 
 Fig4.Obj3 <- ggarrange(NEOMonth.plot, NEOMonth.Ests, labels= c("(a)", "(b)"), font.label = list(size = 11)) +
   annotation_custom(grid.rect(.5,.5, width=unit(1,"npc"), height=unit(1,"npc"), gp=gpar(lwd=3, fill=NA, col="black"), draw=TRUE))
 
-Fig4.Obj3 <- annotate_figure(Fig4.Obj3, bottom = text_grob(expression(paste("* p< 0.05; ** p<0.01; *** p<0.001 ", "\u2020", " log transformed")), hjust = 2.95, x = 1, face = "italic", size = 8)); Fig4.Obj3
+Fig4.Obj3 <- annotate_figure(Fig4.Obj3, bottom = text_grob(expression(paste("* p< 0.05; ** p<0.01; *** p<0.001 ", "\u2020", " log transformed")), hjust = 2.7, x = 1, face = "italic", size = 8)); Fig4.Obj3
 
 ggsave("~/Google Drive/Projects/Masters/rhesus-sociality-fGC-uNEO/Fig4.pdf", Fig4.Obj3, width= 174, height= 100, units= "mm", device=cairo_pdf)
 ```
